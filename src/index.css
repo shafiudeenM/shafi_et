@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #0a0a0a;
+    color: #f4f4f5;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+.font-serif-luxury {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(160, 160, 160, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(160, 160, 160, 0.5);
+}
+
+/* =========================================================
+   LIGHT MODE (ACADEMIC SLATE / HIGH-CONTRAST LIGHT)
+   ========================================================= */
+[data-theme="light"] {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* App Backgrounds */
+[data-theme="light"] .bg-\[\#0a0a0a\],
+[data-theme="light"] .bg-\[\#0d0d0d\],
+[data-theme="light"] .bg-\[\#121212\],
+[data-theme="light"] .bg-\[\#141414\],
+[data-theme="light"] .bg-\[\#151515\],
+[data-theme="light"] .bg-\[\#171717\],
+[data-theme="light"] .bg-\[\#181818\],
+[data-theme="light"] .bg-\[\#1c1c1c\] {
+  background-color: #ffffff !important;
+}
+
+[data-theme="light"] .bg-\[\#0a0a0a\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-theme="light"] .bg-white\/\[0\.03\],
+[data-theme="light"] .bg-white\/\[0\.04\],
+[data-theme="light"] .bg-white\/\[0\.05\],
+[data-theme="light"] .bg-white\/5 {
+  background-color: #f1f5f9 !important;
+}
+
+[data-theme="light"] .bg-\[\#262626\],
+[data-theme="light"] .bg-\[\#2a2a2a\],
+[data-theme="light"] .bg-\[\#333333\] {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Borders */
+[data-theme="light"] .border-\[\#262626\],
+[data-theme="light"] .border-\[\#2a2a2a\],
+[data-theme="light"] .border-\[\#333333\],
+[data-theme="light"] .border-white\/10,
+[data-theme="light"] .border-white\/\[0\.06\],
+[data-theme="light"] .border-white\/\[0\.08\] {
+  border-color: #e2e8f0 !important;
+}
+
+/* Typography */
+[data-theme="light"] .text-white {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .text-white\/90,
+[data-theme="light"] .text-white\/80,
+[data-theme="light"] .text-white\/70 {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .text-white\/60,
+[data-theme="light"] .text-white\/50,
+[data-theme="light"] .text-white\/40,
+[data-theme="light"] .text-\[\#a3a3a3\],
+[data-theme="light"] .text-\[\#737373\] {
+  color: #64748b !important;
+}
+
+/* Brand Accent & Logo Gradient Overrides */
+[data-theme="light"] .text-\[\#c5a059\] {
+  color: #2563eb !important;
+}
+
+[data-theme="light"] .bg-\[\#c5a059\] {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .bg-\[\#c5a059\]\/10,
+[data-theme="light"] .bg-\[\#c5a059\]\/15,
+[data-theme="light"] .bg-\[\#c5a059\]\/20 {
+  background-color: rgba(37, 99, 235, 0.1) !important;
+}
+
+[data-theme="light"] .border-\[\#c5a059\],
+[data-theme="light"] .border-\[\#c5a059\]\/30,
+[data-theme="light"] .border-\[\#c5a059\]\/40 {
+  border-color: #2563eb !important;
+}
+
+/* Specific Logo and Header Accents in Light Mode */
+[data-theme="light"] .from-\[\#c5a059\] {
+  --tw-gradient-from: #2563eb !important;
+  --tw-gradient-to: #1d4ed8 !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+[data-theme="light"] .to-\[\#8d6f30\] {
+  --tw-gradient-to: #1d4ed8 !important;
+}
+
+[data-theme="light"] .from-\[\#c5a059\]\/20 {
+  --tw-gradient-from: rgba(37, 99, 235, 0.2) !important;
+}
+
+[data-theme="light"] .to-\[\#8d6f30\]\/20 {
+  --tw-gradient-to: rgba(29, 78, 216, 0.2) !important;
+}
+
+[data-theme="light"] .shadow-\[\#c5a059\]\/10,
+[data-theme="light"] .shadow-\[\#c5a059\]\/15,
+[data-theme="light"] .shadow-\[\#c5a059\]\/20 {
+  --tw-shadow-color: rgba(37, 99, 235, 0.15) !important;
+}

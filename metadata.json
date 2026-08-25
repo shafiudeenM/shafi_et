@@ -1,0 +1,6 @@
+{
+  "name": "TNTET Personal Coach",
+  "description": "Offline-first personalized preparation and diagnostic system for Tamil Nadu Teacher Eligibility Test (Paper I & Paper II) featuring PWA service worker caching, local storage synchronization, 150Q TRB simulator, mistake revision queue, and Tamil-first AI tutoring.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

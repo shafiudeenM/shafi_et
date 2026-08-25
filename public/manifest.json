@@ -1,0 +1,27 @@
+{
+  "name": "TNTET 2026 Personal Coach | தமிழ்நாடு ஆசிரியர் தகுதித் தேர்வு",
+  "short_name": "TNTET Coach",
+  "description": "Personalized Offline-First TRB & SCERT Preparation & Diagnostic Platform for TNTET Paper I & Paper II",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#c5a059",
+  "orientation": "portrait-primary",
+  "lang": "ta",
+  "categories": ["education", "productivity", "books"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
