@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { 
   PaperType, 
   LanguageMode, 
@@ -14,10 +14,15 @@ import {
   AuthUser
 } from './types';
 import { 
-  ALL_QUESTIONS, 
   INITIAL_TOPIC_MASTERIES, 
   DEFAULT_USER_PROFILE 
 } from './data/tntetData';
+import {
+  useQuestionBank,
+  getQuestionBank,
+  getQuestionById,
+  initQuestionBank,
+} from './services/questionBankService';
 import { 
   calculateCandidateReadiness, 
   generateDailyPlan, 
@@ -27,21 +32,35 @@ import { Navbar } from './components/Navbar';
 import { LandingPage } from './components/LandingPage';
 import { AuthModal } from './components/AuthModal';
 import { DashboardView } from './components/DashboardView';
-import { DiagnosticView } from './components/DiagnosticView';
-import { DailySessionView } from './components/DailySessionView';
-import { PracticeView } from './components/PracticeView';
-import { MistakeQueueView } from './components/MistakeQueueView';
-import { PYQVaultView } from './components/PYQVaultView';
-import { FlashcardsDeckView } from './components/FlashcardsDeckView';
-import { AdminDashboardView } from './components/AdminDashboardView';
-import { ExamSimulatorView } from './components/ExamSimulatorView';
-import { AITutorModal } from './components/AITutorModal';
-import { PDFReportExportModal } from './components/PDFReportExportModal';
-import { CandidateProfileModal } from './components/CandidateProfileModal';
-import { IntegrationsModal } from './components/IntegrationsModal';
-import { MobileExportModal } from './components/MobileExportModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+// Heavier, non-initial views are lazy-loaded so the initial bundle (dashboard)
+// stays small. Each is split into its own chunk and fetched on demand.
+const DiagnosticView = React.lazy(() => import('./components/DiagnosticView').then(m => ({ default: m.DiagnosticView })));
+const DailySessionView = React.lazy(() => import('./components/DailySessionView').then(m => ({ default: m.DailySessionView })));
+const PracticeView = React.lazy(() => import('./components/PracticeView').then(m => ({ default: m.PracticeView })));
+const MistakeQueueView = React.lazy(() => import('./components/MistakeQueueView').then(m => ({ default: m.MistakeQueueView })));
+const PYQVaultView = React.lazy(() => import('./components/PYQVaultView').then(m => ({ default: m.PYQVaultView })));
+const FlashcardsDeckView = React.lazy(() => import('./components/FlashcardsDeckView').then(m => ({ default: m.FlashcardsDeckView })));
+const AdminDashboardView = React.lazy(() => import('./components/AdminDashboardView').then(m => ({ default: m.AdminDashboardView })));
+const ExamSimulatorView = React.lazy(() => import('./components/ExamSimulatorView').then(m => ({ default: m.ExamSimulatorView })));
+const MarkBudgetView = React.lazy(() => import('./components/MarkBudgetView').then(m => ({ default: m.MarkBudgetView })));
+const SRSReviewView = React.lazy(() => import('./components/SRSReviewView').then(m => ({ default: m.SRSReviewView })));
+const AITutorModal = React.lazy(() => import('./components/AITutorModal').then(m => ({ default: m.AITutorModal })));
+const PDFReportExportModal = React.lazy(() => import('./components/PDFReportExportModal').then(m => ({ default: m.PDFReportExportModal })));
+const CandidateProfileModal = React.lazy(() => import('./components/CandidateProfileModal').then(m => ({ default: m.CandidateProfileModal })));
+const IntegrationsModal = React.lazy(() => import('./components/IntegrationsModal').then(m => ({ default: m.IntegrationsModal })));
+const MobileExportModal = React.lazy(() => import('./components/MobileExportModal').then(m => ({ default: m.MobileExportModal })));
 import { dbSyncService } from './services/dbSyncService';
 import { authService } from './services/authService';
+import { supabaseAuthService } from './services/supabaseAuthService';
+import { recordStudySession } from './services/streakService';
+import { seedStreakFromStudyDates } from './services/streakService';
+import {
+  mergeMasteries,
+  mergeMistakeQueue,
+  studyDatesFromDailyLogs,
+} from './services/hydrateService';
 import { initNativeMobileApp } from './services/nativeMobileService';
 
 export default function App() {
@@ -52,6 +71,14 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'landing' | 'app'>(() => {
     return authService.isAuthenticated() ? 'app' : 'landing';
   });
+
+  // Live question bank (static seed + Supabase questions merged at runtime).
+  const questionBank = useQuestionBank();
+
+  // Hydrate the question bank from Supabase on app mount.
+  useEffect(() => {
+    initQuestionBank().catch((err) => console.warn('[App] question bank init failed:', err));
+  }, []);
 
   // Navigation tab in authenticated app
   const [activeTab, setActiveTab] = useState<string>('dashboard');
@@ -124,10 +151,10 @@ export default function App() {
     return [
       {
         id: 'mq_1',
-        question: ALL_QUESTIONS[0],
+        question: getQuestionBank()[0],
         lastInteraction: {
           id: 'int_sample_1',
-          questionId: ALL_QUESTIONS[0].id,
+          questionId: getQuestionBank()[0].id,
           selectedOptionIndex: 1,
           isCorrect: false,
           timeSpentSec: 42,
@@ -141,10 +168,10 @@ export default function App() {
       },
       {
         id: 'mq_2',
-        question: ALL_QUESTIONS[1],
+        question: getQuestionBank()[1],
         lastInteraction: {
           id: 'int_sample_2',
-          questionId: ALL_QUESTIONS[1].id,
+          questionId: getQuestionBank()[1].id,
           selectedOptionIndex: 3,
           isCorrect: false,
           timeSpentSec: 28,
@@ -158,10 +185,10 @@ export default function App() {
       },
       {
         id: 'mq_3',
-        question: ALL_QUESTIONS[2],
+        question: getQuestionBank()[2],
         lastInteraction: {
           id: 'int_sample_3',
-          questionId: ALL_QUESTIONS[2].id,
+          questionId: getQuestionBank()[2].id,
           selectedOptionIndex: 0,
           isCorrect: false,
           timeSpentSec: 15,
@@ -254,6 +281,68 @@ export default function App() {
     }
   }, [selectedPaper, languageMode, category, availableDailyMinutes, targetExamDate]);
 
+  // Initialize Supabase auth session + subscribe to auth state changes.
+  // Wires up dbSyncService.setUserId() and hydrates cloud data on sign-in.
+  useEffect(() => {
+    if (!supabaseAuthService.isAvailable()) return;
+
+    let active = true;
+
+    // Shared hydration: pull cloud data back locally and merge it into app
+    // state. Mirrors handleAuthSuccess but is used for session restore and
+    // auth-state-change events (e.g. OAuth redirect completion).
+    const applyCloudHydration = async () => {
+      if (!dbSyncService.isCloudConnected()) return;
+      try {
+        const cloud = await dbSyncService.hydrateFromCloud();
+
+        if (cloud.profile) {
+          if (cloud.profile.selectedPaper) setSelectedPaper(cloud.profile.selectedPaper);
+          if (cloud.profile.category) setCategory(cloud.profile.category);
+          if (cloud.profile.dailyStudyMinutes) setAvailableDailyMinutes(cloud.profile.dailyStudyMinutes);
+          if (cloud.profile.targetExamDate) setTargetExamDate(cloud.profile.targetExamDate);
+        }
+        if (cloud.masteries) setTopicMasteries((prev) => mergeMasteries(prev, cloud.masteries));
+        if (cloud.mistakeQueue) setMistakeQueue((prev) => mergeMistakeQueue(prev, cloud.mistakeQueue));
+        if (cloud.dailyLogs) seedStreakFromStudyDates(studyDatesFromDailyLogs(cloud.dailyLogs));
+      } catch (err) {
+        console.warn('Cloud hydration on session restore failed:', err);
+      }
+    };
+
+    const init = async () => {
+      const sessionUser = await supabaseAuthService.getSessionUser();
+      if (!active) return;
+      if (sessionUser) {
+        setAuthUser(sessionUser);
+        setViewMode('app');
+        applyCloudHydration();
+      }
+    };
+    init();
+
+    const unsubscribe = supabaseAuthService.onAuthStateChange((user) => {
+      if (!active) return;
+      if (user) {
+        setAuthUser(user);
+        setViewMode('app');
+        applyCloudHydration();
+      } else {
+        // Only clear auth user if the current user is a Supabase session.
+        setAuthUser((current) => {
+          const email = current?.email;
+          if (email && !supabaseAuthService.isAvailable()) return current;
+          return null;
+        });
+      }
+    });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, []);
+
   // Handlers
   const handleOpenAITutor = (topicOrQuestion: string | Question) => {
     if (typeof topicOrQuestion === 'string') {
@@ -285,6 +374,9 @@ export default function App() {
 
     const nextInteractions = [...userInteractions, interaction];
     setUserInteractions(nextInteractions);
+
+    // Record study streak
+    recordStudySession(Math.round(timeSec / 60), 1, isCorrect ? 1 : 0);
 
     // Update topic mastery
     setTopicMasteries((prev) => {
@@ -333,11 +425,14 @@ export default function App() {
     const nextInteractions = [...userInteractions, ...interactions];
     setUserInteractions(nextInteractions);
 
+    // Record diagnostic study streak
+    recordStudySession(0, interactions.length, interactions.filter(i => i.isCorrect).length);
+
     // Update masteries from diagnostic
     setTopicMasteries((prev) => {
       return prev.map((t) => {
         const matching = interactions.filter((i) => {
-          const q = ALL_QUESTIONS.find((item) => item.id === i.questionId);
+          const q = getQuestionById(i.questionId);
           return q && q.topicId === t.topicId;
         });
 
@@ -404,17 +499,47 @@ export default function App() {
     });
   };
 
-  const handleAuthSuccess = (user: AuthUser) => {
+  const handleAuthSuccess = async (user: AuthUser) => {
     setAuthUser(user);
     setSelectedPaper(user.targetPaper);
     setCategory(user.category);
     setAvailableDailyMinutes(user.dailyMinutes);
     setViewMode('app');
     setIsAuthModalOpen(false);
+
+    // When Supabase is configured, pull cloud data back locally and merge it
+    // BEFORE any sync push so fresh local state never clobbers the cloud.
+    if (dbSyncService.isCloudConnected()) {
+      try {
+        const cloud = await dbSyncService.hydrateFromCloud();
+
+        if (cloud.profile) {
+          if (cloud.profile.selectedPaper) setSelectedPaper(cloud.profile.selectedPaper);
+          if (cloud.profile.category) setCategory(cloud.profile.category);
+          if (cloud.profile.dailyStudyMinutes) setAvailableDailyMinutes(cloud.profile.dailyStudyMinutes);
+          if (cloud.profile.targetExamDate) setTargetExamDate(cloud.profile.targetExamDate);
+        }
+
+        if (cloud.masteries) {
+          setTopicMasteries((prev) => mergeMasteries(prev, cloud.masteries));
+        }
+        if (cloud.mistakeQueue) {
+          setMistakeQueue((prev) => mergeMistakeQueue(prev, cloud.mistakeQueue));
+        }
+        if (cloud.dailyLogs) {
+          seedStreakFromStudyDates(studyDatesFromDailyLogs(cloud.dailyLogs));
+        }
+      } catch (err) {
+        console.warn('Cloud hydration after login failed:', err);
+      }
+    }
   };
 
   const handleLogout = () => {
     authService.logout();
+    if (supabaseAuthService.isAvailable()) {
+      supabaseAuthService.signOut().catch(console.warn);
+    }
     setAuthUser(null);
     setViewMode('landing');
   };
@@ -475,6 +600,16 @@ export default function App() {
   }
 
   return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center font-sans">
+          <div className="w-8 h-8 border-2 border-[#c5a059] border-t-transparent rounded-full animate-spin" />
+          <p className="mt-3 text-xs text-[#a3a3a3]">
+            {languageMode === 'tamil' ? 'ஏற்றுகிறது…' : 'Loading…'}
+          </p>
+        </div>
+      }
+    >
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col font-sans selection:bg-[#c5a059] selection:text-[#0a0a0a]">
       {/* Top Navigation */}
       <Navbar
@@ -500,6 +635,11 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-4">
+        <ErrorBoundary
+          fallbackTitle="பகுதியில் பிழை / Section Error"
+          fallbackMessage="இந்த பகுதியில் பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்."
+          onReset={() => setActiveTab('dashboard')}
+        >
         {/* Dynamic Admin Broadcast Banner if enabled */}
         {(() => {
           const cfg = localStorage.getItem('tntet_admin_app_config');
@@ -607,6 +747,29 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'mark_budget' && (
+          <MarkBudgetView
+            selectedPaper={selectedPaper}
+            category={category}
+            languageMode={languageMode}
+            topicMasteries={topicMasteries}
+          />
+        )}
+
+        {activeTab === 'srs_review' && (
+          <SRSReviewView
+            languageMode={languageMode}
+            mistakeQueue={mistakeQueue}
+            availableMinutes={availableDailyMinutes}
+            onReviewComplete={(questionId, isCorrect) => {
+              const question = getQuestionById(questionId);
+              if (question) {
+                handleRecordAnswer(question, -1, isCorrect, 0);
+              }
+            }}
+          />
+        )}
+
         {activeTab === 'admin' && (
           <AdminDashboardView
             languageMode={languageMode}
@@ -638,6 +801,7 @@ export default function App() {
             />
           </div>
         )}
+        </ErrorBoundary>
       </main>
 
       {/* Persistent AI Tutor Floating Modal / Drawer */}
@@ -667,7 +831,7 @@ export default function App() {
         readiness={readiness}
         topicMasteries={topicMasteries}
         mistakeQueue={mistakeQueue}
-        questions={ALL_QUESTIONS}
+        questions={questionBank}
         languageMode={languageMode}
       />
 
@@ -688,5 +852,6 @@ export default function App() {
         languageMode={languageMode}
       />
     </div>
+    </Suspense>
   );
 }

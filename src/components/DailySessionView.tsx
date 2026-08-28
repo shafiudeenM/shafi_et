@@ -5,7 +5,7 @@ import {
   LanguageMode, 
   UserInteraction 
 } from '../types';
-import { ALL_QUESTIONS } from '../data/tntetData';
+import { useQuestionBank } from '../services/questionBankService';
 import { 
   BookOpen, 
   CheckCircle2, 
@@ -54,9 +54,10 @@ export const DailySessionView: React.FC<DailySessionViewProps> = ({
   const [checkSubmitted, setCheckSubmitted] = useState(false);
   const [checkCorrectCount, setCheckCorrectCount] = useState(0);
 
-  const practiceQuestions = ALL_QUESTIONS.filter((q) => q.topicId === plan.targetTopicId).concat(ALL_QUESTIONS).slice(0, 10);
-  const reviewQuestions = ALL_QUESTIONS.slice(0, 3);
-  const checkQuestions = ALL_QUESTIONS.slice(3, 8);
+  const questions = useQuestionBank();
+  const practiceQuestions = questions.filter((q) => q.topicId === plan.targetTopicId).concat(questions).slice(0, 10);
+  const reviewQuestions = questions.slice(0, 3);
+  const checkQuestions = questions.slice(3, 8);
 
   const handleCompleteLearn = () => {
     const updated = {

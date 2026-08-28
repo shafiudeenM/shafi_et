@@ -8,9 +8,9 @@ import {
   ReservationCategory 
 } from '../types';
 import { 
-  ALL_QUESTIONS, 
   SUBJECT_METADATA 
 } from '../data/tntetData';
+import { useQuestionBank } from '../services/questionBankService';
 import { classifyError } from '../services/recommendationEngine';
 import { 
   Zap, 
@@ -43,9 +43,10 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
   onOpenAITutor,
 }) => {
   const isTamil = languageMode === 'tamil';
+  const questions = useQuestionBank();
 
   // Sample questions across subjects for a concise 10-question diagnostic
-  const diagnosticQuestions = ALL_QUESTIONS.slice(0, 10);
+  const diagnosticQuestions = questions.slice(0, 10);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);

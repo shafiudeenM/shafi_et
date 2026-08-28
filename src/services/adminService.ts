@@ -1,6 +1,6 @@
 import { Question, SubjectId, PaperType, ErrorType } from '../types';
 import { AppConfigSettings, CandidateCohortMetric, HardestDistractorMetric, SystemTelemetry } from '../types/adminTypes';
-import { ALL_QUESTIONS } from '../data/tntetData';
+import { getQuestionBank } from './questionBankService';
 
 const ADMIN_CONFIG_STORAGE_KEY = 'tntet_admin_app_config';
 const ADMIN_CUSTOM_QUESTIONS_KEY = 'tntet_admin_custom_questions';
@@ -113,7 +113,7 @@ export const INITIAL_COHORT_DATA: CandidateCohortMetric[] = [
     avgScore: 98.4,
     readinessPercentage: 88,
     lastActive: 'just now',
-    weakestSubject: 'science',
+    weakestSubject: 'maths_science',
     predictedQualified: true,
   },
   {
@@ -158,7 +158,7 @@ export const INITIAL_HARDEST_DISTRACTORS: HardestDistractorMetric[] = [
     questionId: 'q_sci_1',
     questionSnippetEn: 'Endocrine master gland regulating growth hormone secretagogues...',
     questionSnippetTa: 'வளர்ச்சி ஹார்மோன்களை கட்டுப்படுத்தும் முதன்மை நாளமில்லா சுரப்பி...',
-    subject: 'science',
+    subject: 'maths_science',
     paper: 'PAPER_II_MATH_SCI',
     totalAttempts: 2940,
     accuracyRate: 48.5,
@@ -210,7 +210,7 @@ export const adminService = {
 
   getAllQuestions(): Question[] {
     const custom = this.getCustomQuestions();
-    return [...custom, ...ALL_QUESTIONS];
+      return [...custom, ...getQuestionBank()];
   },
 
   saveQuestion(question: Question): Question {

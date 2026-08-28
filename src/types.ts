@@ -12,7 +12,7 @@ export type SubjectId =
   | 'english' 
   | 'maths' 
   | 'evs' 
-  | 'science' 
+  | 'maths_science' 
   | 'social_science';
 
 export type ErrorType = 
@@ -241,4 +241,201 @@ export interface UserProfile {
   streakDays: number;
   targetExamDate?: string; // e.g. "2026-10-18"
   theme?: ThemeMode;
+}
+
+// ============================================================================
+// DATABASE ROW TYPES — match Supabase table schemas exactly
+// ============================================================================
+
+/** subjects table row */
+export interface DbSubject {
+  id: string;
+  name_en: string;
+  name_ta: string;
+  color: string;
+  icon_name: string;
+  created_at: string;
+}
+
+/** syllabus_topics table row */
+export interface DbSyllabusTopic {
+  id: string;
+  subject_id: string;
+  paper: 'PAPER_I' | 'PAPER_II';
+  unit_id: string;
+  unit_name_en: string;
+  unit_name_ta: string;
+  name_en: string;
+  name_ta: string;
+  keyword_en: string[];
+  keyword_ta: string[];
+  created_at: string;
+}
+
+/** question_papers table row */
+export interface DbQuestionPaper {
+  id: string;
+  year: number;
+  paper_type: PaperType;
+  shift: string | null;
+  source: string;
+  total_questions: number;
+  created_at: string;
+}
+
+/** questions table row */
+export interface DbQuestion {
+  id: string;
+  paper_id: string;
+  subject_id: string;
+  topic_id: string;
+  sno: number | null;
+  question_no: string | null;
+  question_en: string;
+  question_ta: string;
+  option_a_en: string;
+  option_a_ta: string;
+  option_b_en: string;
+  option_b_ta: string;
+  option_c_en: string;
+  option_c_ta: string;
+  option_d_en: string;
+  option_d_ta: string;
+  correct_option: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+  question_type: 'conceptual' | 'factual' | 'application' | 'pedagogy';
+  explanation_en: string | null;
+  explanation_ta: string | null;
+  concept_summary_en: string | null;
+  concept_summary_ta: string | null;
+  syllabus_ref: string | null;
+  year: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+/** category_cutoffs table row */
+export interface DbCategoryCutoff {
+  id: string;
+  category: ReservationCategory;
+  year: number;
+  cutoff_marks: number;
+  total_marks: number;
+  percentage: number;
+  source: string | null;
+  created_at: string;
+}
+
+/** question_topics junction table row */
+export interface DbQuestionTopic {
+  id: string;
+  question_id: string;
+  topic_id: string;
+  is_primary: boolean;
+  relevance_score: number;
+  created_at: string;
+}
+
+/** user_profiles table row (linked to auth.users) */
+export interface DbUserProfile {
+  id: string; // auth.users UUID
+  email: string | null;
+  name: string;
+  selected_paper: PaperType;
+  language_mode: LanguageMode;
+  persona: CandidatePersona;
+  category: ReservationCategory;
+  daily_study_minutes: number;
+  has_completed_diagnostic: boolean;
+  target_exam_date: string | null;
+  streak_days: number;
+  longest_streak: number;
+  theme: ThemeMode;
+  created_at: string;
+  updated_at: string;
+}
+
+/** topic_masteries table row */
+export interface DbTopicMastery {
+  id: string;
+  user_id: string;
+  topic_id: string;
+  subject_id: string;
+  mastery_score: number;
+  questions_attempted: number;
+  questions_correct: number;
+  avg_time_per_question: number;
+  status: 'weak' | 'developing' | 'exam_ready';
+  last_attempt_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** mistake_queue table row */
+export interface DbMistakeQueue {
+  id: string;
+  user_id: string;
+  question_id: string;
+  subject_id: string;
+  topic_id: string;
+  mistake_tag: ErrorType;
+  selected_option: number | null;
+  review_count: number;
+  next_review_at: string | null;
+  is_resolved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/** daily_study_logs table row */
+export interface DbDailyStudyLog {
+  id: string;
+  user_id: string;
+  study_date: string; // YYYY-MM-DD
+  minutes_studied: number;
+  questions_attempted: number;
+  questions_correct: number;
+  topics_touched: string[];
+  streak_day_number: number;
+  created_at: string;
+}
+
+/** study_sessions table row */
+export interface DbStudySession {
+  id: string;
+  user_id: string;
+  session_type: 'diagnostic' | 'daily_practice' | 'mistake_review' | 'quick_check' | 'full_simulation';
+  subject_id: string | null;
+  topic_id: string | null;
+  duration_seconds: number;
+  questions_attempted: number;
+  questions_correct: number;
+  accuracy_pct: number;
+  avg_time_per_question: number;
+  started_at: string;
+  ended_at: string | null;
+  created_at: string;
+}
+
+/** simulation_history table row */
+export interface DbSimulationHistory {
+  id: string;
+  user_id: string;
+  paper: PaperType;
+  category: ReservationCategory;
+  score: number;
+  total_questions: number;
+  correct_count: number;
+  wrong_count: number;
+  unanswered_count: number;
+  time_spent_seconds: number;
+  is_qualified: boolean;
+  time_distribution: Record<string, unknown>;
+  answer_changes: Record<string, unknown>;
+  careless_errors: number;
+  time_pressure_drops: number;
+  prescription_en: string | null;
+  prescription_ta: string | null;
+  started_at: string | null;
+  created_at: string;
 }

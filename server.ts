@@ -7,9 +7,38 @@ import { createServer as createViteServer } from 'vite';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const AI_RATE_LIMIT_PER_MINUTE = parseInt(process.env.AI_RATE_LIMIT_PER_MINUTE || '30', 10);
 
 app.use(express.json());
+
+// Simple in-memory rate limiting for AI endpoints
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
+function rateLimitMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const windowMs = 60 * 1000; // 1 minute window
+  
+  const record = rateLimitMap.get(clientIp);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(clientIp, { count: 1, resetTime: now + windowMs });
+    return next();
+  }
+  
+  if (record.count >= AI_RATE_LIMIT_PER_MINUTE) {
+    return res.status(429).json({ 
+      success: false, 
+      error: 'Rate limit exceeded. Please try again later.',
+      retryAfter: Math.ceil((record.resetTime - now) / 1000)
+    });
+  }
+  
+  record.count++;
+  next();
+}
 
 // Initialize Gemini SDK with server-side API key
 let aiClient: GoogleGenAI | null = null;
@@ -34,6 +63,7 @@ function getGeminiClient(): GoogleGenAI {
 // Server-side response cache for AI queries to ensure instant responses, zero latency & $0 repeat cost
 const aiResponseCache = new Map<string, { reply: any; timestamp: number }>();
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_MAX_SIZE = 5000;
 
 function getCachedAIResponse(key: string): any | null {
   const entry = aiResponseCache.get(key);
@@ -42,12 +72,19 @@ function getCachedAIResponse(key: string): any | null {
     aiResponseCache.delete(key);
     return null;
   }
+  // Move to end for LRU behavior (most recently used)
+  aiResponseCache.delete(key);
+  aiResponseCache.set(key, entry);
   return entry.reply;
 }
 
 function setCachedAIResponse(key: string, reply: any): void {
-  // Cap cache size to 5,000 entries to prevent memory pressure
-  if (aiResponseCache.size > 5000) {
+  // Delete existing key if present to update position
+  if (aiResponseCache.has(key)) {
+    aiResponseCache.delete(key);
+  }
+  // Evict oldest entries if cache is full (LRU - least recently used at the beginning)
+  while (aiResponseCache.size >= CACHE_MAX_SIZE) {
     const oldestKey = aiResponseCache.keys().next().value;
     if (oldestKey) aiResponseCache.delete(oldestKey);
   }
@@ -59,8 +96,8 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'TNTET Personal Coach API', cachedEntries: aiResponseCache.size });
 });
 
-// API: AI Tutor explanation for missed question
-app.post('/api/tutor/explain', async (req, res) => {
+// API: AI Tutor explanation for missed question (with rate limiting)
+app.post('/api/tutor/explain', rateLimitMiddleware, async (req, res) => {
   try {
     const { question, selectedOption, correctOption, subject, topic, languageMode } = req.body;
     const isTamil = languageMode === 'tamil' || languageMode === 'bilingual';
@@ -117,7 +154,7 @@ Full Options: ${JSON.stringify(question?.options || [])}
 Please provide a targeted concept explanation and 3 quick check verification questions.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: GEMINI_MODEL,
       contents: prompt,
       config: {
         systemInstruction: systemPrompt,
@@ -151,8 +188,8 @@ Please provide a targeted concept explanation and 3 quick check verification que
   }
 });
 
-// API: AI Tutor Chat (Focused on TNTET syllabus & candidate doubts)
-app.post('/api/tutor/chat', async (req, res) => {
+// API: AI Tutor Chat (Focused on TNTET syllabus & candidate doubts, with rate limiting)
+app.post('/api/tutor/chat', rateLimitMiddleware, async (req, res) => {
   try {
     const { message, context, languageMode } = req.body;
     const isTamil = languageMode === 'tamil' || languageMode === 'bilingual';
@@ -181,7 +218,7 @@ Language: ${isTamil ? 'Tamil (தமிழ்) with accurate educational terms' 
 Be concise, encouraging, and provide exam-oriented insights.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: GEMINI_MODEL,
       contents: message,
       config: {
         systemInstruction: systemPrompt,
@@ -204,8 +241,8 @@ Be concise, encouraging, and provide exam-oriented insights.`;
   }
 });
 
-// API: Diagnostic Analysis Prescription
-app.post('/api/diagnose/prescribe', async (req, res) => {
+// API: Diagnostic Analysis Prescription (with rate limiting)
+app.post('/api/diagnose/prescribe', rateLimitMiddleware, async (req, res) => {
   try {
     const { results, paper, languageMode } = req.body;
     const isTamil = languageMode === 'tamil' || languageMode === 'bilingual';
@@ -221,7 +258,7 @@ app.post('/api/diagnose/prescribe', async (req, res) => {
 
     const ai = getGeminiClient();
     const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash',
+      model: GEMINI_MODEL,
       contents: `Candidate diagnostic score: ${JSON.stringify(results)} for ${paper}. Provide a 2-sentence actionable prescription for what to study today in ${isTamil ? 'Tamil' : 'English'}.`,
     });
 

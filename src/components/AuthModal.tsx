@@ -7,6 +7,7 @@ import {
   AuthUser 
 } from '../types';
 import { authService } from '../services/authService';
+import { supabaseAuthService } from '../services/supabaseAuthService';
 import { 
   GraduationCap, 
   X, 
@@ -66,7 +67,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setErrorMsg(null);
     setLoading(true);
     try {
-      const user = await authService.login({ email, password });
+      // Prefer real Supabase Auth, fall back to mock authService.
+      let user: AuthUser;
+      if (supabaseAuthService.isAvailable()) {
+        const result = await supabaseAuthService.signIn(email, password);
+        if (result.ok && result.user) {
+          user = result.user;
+        } else {
+          setErrorMsg(result.error || 'Login failed. Please check credentials.');
+          return;
+        }
+      } else {
+        user = await authService.login({ email, password });
+      }
       onAuthSuccess(user);
       onClose();
     } catch (err: any) {
@@ -89,14 +102,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setErrorMsg(null);
     setLoading(true);
     try {
-      const user = await authService.register({
-        name,
-        email,
-        password,
-        targetPaper,
-        category,
-        dailyMinutes
-      });
+      // Prefer real Supabase Auth, fall back to mock authService.
+      let user: AuthUser;
+      if (supabaseAuthService.isAvailable()) {
+        const result = await supabaseAuthService.signUp({
+          name,
+          email,
+          password,
+          targetPaper,
+          category,
+          dailyMinutes,
+        });
+        if (result.ok && result.user) {
+          user = result.user;
+          if (result.requiresEmailConfirmation) {
+            setSuccessMsg(
+              isTamil
+                ? 'கணக்கு உருவாக்கப்பட்டது! உங்கள் மின்னஞ்சலை உறுதிப்படுத்தவும்.'
+                : 'Account created! Please confirm your email to continue.'
+            );
+            setTimeout(() => {
+              setSuccessMsg(null);
+              setMode('signin');
+            }, 2500);
+            return;
+          }
+        } else {
+          setErrorMsg(result.error || 'Registration failed. Please try again.');
+          return;
+        }
+      } else {
+        user = await authService.register({
+          name,
+          email,
+          password,
+          targetPaper,
+          category,
+          dailyMinutes
+        });
+      }
       onAuthSuccess(user);
       onClose();
     } catch (err: any) {
@@ -110,9 +154,29 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setErrorMsg(null);
     try {
-      const user = await authService.signInWithGoogle();
-      onAuthSuccess(user);
-      onClose();
+      // Prefer real Supabase Google OAuth (redirect flow), fall back to mock.
+      let user: AuthUser | null = null;
+      if (supabaseAuthService.isAvailable()) {
+        const result = await supabaseAuthService.signInWithGoogle();
+        // The OAuth flow redirects the browser; only proceed if it resolved
+        // synchronously with a user (e.g. used in a non-redirect context).
+        if (result.ok && result.user) {
+          user = result.user;
+        } else if (result.error) {
+          setErrorMsg(result.error);
+          return;
+        }
+        if (!user) {
+          // Browser will redirect for Google OAuth; don't close modal.
+          return;
+        }
+      } else {
+        user = await authService.signInWithGoogle();
+      }
+      if (user) {
+        onAuthSuccess(user);
+        onClose();
+      }
     } catch (err: any) {
       setErrorMsg('Google Sign-In authentication error. Please try again or use email.');
     } finally {
@@ -127,11 +191,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
     setErrorMsg(null);
-    setSuccessMsg(isTamil ? 'கடவுச்சொல் மீட்டெடுப்பு இணைப்பு அனுப்பப்பட்டது!' : 'Password reset link sent to your email!');
-    setTimeout(() => {
-      setMode('signin');
-      setSuccessMsg(null);
-    }, 2000);
+    if (supabaseAuthService.isAvailable()) {
+      supabaseAuthService.resetPassword(email).then((res) => {
+        if (res.ok) {
+          setSuccessMsg(isTamil ? 'கடவுச்சொல் மீட்டெடுப்பு இணைப்பு அனுப்பப்பட்டது!' : 'Password reset link sent to your email!');
+          setTimeout(() => {
+            setMode('signin');
+            setSuccessMsg(null);
+          }, 2000);
+        } else {
+          setErrorMsg(res.error || 'Password reset failed. Please try again.');
+        }
+      });
+    } else {
+      setSuccessMsg(isTamil ? 'கடவுச்சொல் மீட்டெடுப்பு இணைப்பு அனுப்பப்பட்டது!' : 'Password reset link sent to your email!');
+      setTimeout(() => {
+        setMode('signin');
+        setSuccessMsg(null);
+      }, 2000);
+    }
   };
 
   return (

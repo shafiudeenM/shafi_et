@@ -360,7 +360,7 @@ export const PYQ_QUESTIONS_ARCHIVE: Question[] = [
   {
     id: 'pyq_2019_p2_sci_1',
     paper: 'PAPER_II_MATH_SCI',
-    subject: 'science',
+    subject: 'maths_science',
     unit: 'Physics: Optics & Light',
     chapter: 'Reflection & Mirrors',
     topic: 'Living Organisms & Environmental Science',

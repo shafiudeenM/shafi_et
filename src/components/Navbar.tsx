@@ -103,6 +103,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'mistakes', labelEn: 'Weakness Vault', labelTa: 'பலவீன பெட்டகம்' },
     { id: 'diagnostic', labelEn: 'Diagnostic Test', labelTa: 'குறை கண்டறி' },
     { id: 'simulator', labelEn: '150Q Simulator', labelTa: 'மாதிரி தேர்வு' },
+    { id: 'mark_budget', labelEn: 'Mark Budget', labelTa: 'மதிப்பெண் திட்டமிடல்' },
+    { id: 'srs_review', labelEn: 'SRS Review', labelTa: 'மறுபார்வை பயிற்சி' },
     { id: 'syllabus', labelEn: 'Syllabus', labelTa: 'பாடத்திட்டம்' },
     { id: 'admin', labelEn: 'Admin Console', labelTa: 'நிர்வாக மையம்' },
   ];

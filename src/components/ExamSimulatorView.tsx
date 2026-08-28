@@ -6,7 +6,8 @@ import {
   SubjectId, 
   ReservationCategory 
 } from '../types';
-import { ALL_QUESTIONS, SUBJECT_METADATA } from '../data/tntetData';
+import { SUBJECT_METADATA } from '../data/tntetData';
+import { useQuestionBank } from '../services/questionBankService';
 import { 
   Clock, 
   AlertCircle, 
@@ -44,9 +45,10 @@ export const ExamSimulatorView: React.FC<ExamSimulatorViewProps> = ({
 }) => {
   const isTamil = languageMode === 'tamil';
 
-  // Build simulated 30-question expedited official sample (or full 150)
-  const mockQuestions = Array.from({ length: 30 }).map((_, i) => {
-    const baseQ = ALL_QUESTIONS[i % ALL_QUESTIONS.length];
+  // Build full 150-question official TRB exam simulation
+  const questions = useQuestionBank();
+  const mockQuestions = Array.from({ length: 150 }).map((_, i) => {
+    const baseQ = questions[i % questions.length];
     return {
       ...baseQ,
       id: `sim_q_${i + 1}`,
@@ -59,7 +61,7 @@ export const ExamSimulatorView: React.FC<ExamSimulatorViewProps> = ({
   const [markedForReview, setMarkedForReview] = useState<Record<number, boolean>>({});
   const [visited, setVisited] = useState<Record<number, boolean>>({ 0: true });
   const [answerChangeCount, setAnswerChangeCount] = useState<{ rightToWrong: number; wrongToRight: number }>({ rightToWrong: 1, wrongToRight: 3 });
-  const [timeRemainingSec, setTimeRemainingSec] = useState<number>(30 * 60); // 30 mins for 30 Q demo simulation
+  const [timeRemainingSec, setTimeRemainingSec] = useState<number>(180 * 60); // 180 mins for full 150Q TRB simulation
   const [isFinished, setIsFinished] = useState(false);
 
   // Timer
@@ -154,11 +156,11 @@ export const ExamSimulatorView: React.FC<ExamSimulatorViewProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto mt-6 text-left">
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
                 <span className="text-[10px] text-[#a3a3a3] font-bold uppercase tracking-wider">{isTamil ? 'மொத்த வினாக்கள்' : 'Total Questions'}</span>
-                <div className="text-base sm:text-lg font-serif font-bold text-white mt-0.5">30 Qs (Demo) / 150 Qs</div>
+                <div className="text-base sm:text-lg font-serif font-bold text-white mt-0.5">150 Qs (Full TRB)</div>
               </div>
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
                 <span className="text-[10px] text-[#a3a3a3] font-bold uppercase tracking-wider">{isTamil ? 'அனுமதிக்கப்பட்ட நேரம்' : 'Time Allowed'}</span>
-                <div className="text-base sm:text-lg font-serif font-bold text-[#c5a059] mt-0.5">30 Mins / 180 Mins</div>
+                <div className="text-base sm:text-lg font-serif font-bold text-[#c5a059] mt-0.5">180 Mins</div>
               </div>
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
                 <span className="text-[10px] text-[#a3a3a3] font-bold uppercase tracking-wider">{isTamil ? 'எதிர்மறை மதிப்பெண்' : 'Negative Marking'}</span>

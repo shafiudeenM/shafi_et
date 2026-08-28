@@ -51,8 +51,8 @@ export const SUBJECT_METADATA: Record<SubjectId, SubjectMeta> = {
     descriptionEn: 'Ecosystems, Living World, TN Geography, Health, Hygiene & EVS Pedagogy',
     descriptionTa: 'சூழலியல், தாவரங்கள்-விலங்குகள், தமிழ்நாடு புவியியல் மற்றும் சுகாதாரம்',
   },
-  science: {
-    id: 'science',
+  maths_science: {
+    id: 'maths_science',
     nameEn: 'Science (Paper II)',
     nameTa: 'அறிவியல் (தாள் II)',
     totalOfficialMarks: 30,

@@ -211,7 +211,7 @@ export const FLASHCARDS_DECK: Flashcard[] = [
   // ====================== SCIENCE & EVS FLASHCARDS ======================
   {
     id: 'fc_sci_1',
-    subjectId: 'science',
+    subjectId: 'maths_science',
     categoryEn: 'Physics Laws & Units',
     categoryTa: 'இயற்பியல் விதிகள் & அலகுகள்',
     topicEn: 'SI Units & Physical Constants',
@@ -229,7 +229,7 @@ export const FLASHCARDS_DECK: Flashcard[] = [
   },
   {
     id: 'fc_sci_2',
-    subjectId: 'science',
+    subjectId: 'maths_science',
     categoryEn: 'Biology & Endocrine System',
     categoryTa: 'உயிரியல் & நாளமில்லா சுரப்பிகள்',
     topicEn: 'Human Endocrine Glands & Master Gland',

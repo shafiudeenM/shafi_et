@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: tntet-personal-coach
+    runtime: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/server.cjs
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: AI_RATE_LIMIT_PER_MINUTE
+        value: 30
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+</content>
+</filePath>

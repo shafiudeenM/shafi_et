@@ -5,7 +5,8 @@ import {
   LanguageMode, 
   ErrorType 
 } from '../types';
-import { ALL_QUESTIONS, SUBJECT_METADATA } from '../data/tntetData';
+import { SUBJECT_METADATA } from '../data/tntetData';
+import { useQuestionBank, getQuestionBank } from '../services/questionBankService';
 import { classifyError } from '../services/recommendationEngine';
 import { triggerHaptic } from '../services/nativeMobileService';
 import { 
@@ -35,21 +36,22 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
   onRecordAnswer,
 }) => {
   const isTamil = languageMode === 'tamil';
+  const questions = useQuestionBank();
 
   const [selectedSubject, setSelectedSubject] = useState<SubjectId | 'all'>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
-  const [activeQuestionId, setActiveQuestionId] = useState<string>(ALL_QUESTIONS[0].id);
+  const [activeQuestionId, setActiveQuestionId] = useState<string>(getQuestionBank()[0].id);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
   const [timeSpent, setTimeSpent] = useState(25);
 
-  const filteredQuestions = ALL_QUESTIONS.filter((q) => {
+  const filteredQuestions = questions.filter((q) => {
     if (selectedSubject !== 'all' && q.subject !== selectedSubject) return false;
     if (selectedDifficulty !== 'all' && q.difficulty !== selectedDifficulty) return false;
     return true;
   });
 
-  const currentQ = filteredQuestions.find((q) => q.id === activeQuestionId) || filteredQuestions[0] || ALL_QUESTIONS[0];
+  const currentQ = filteredQuestions.find((q) => q.id === activeQuestionId) || filteredQuestions[0] || getQuestionBank()[0];
 
   const handleSelectOption = (idx: number) => {
     if (isAnswerRevealed) return;

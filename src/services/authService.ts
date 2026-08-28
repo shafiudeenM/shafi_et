@@ -156,24 +156,8 @@ class AuthService {
     const user = users.find(u => u.email.toLowerCase() === cleanEmail);
 
     if (!user) {
-      // Auto-provision if it's a new email or password match for smooth testing
-      const newUser: AuthUser = {
-        id: 'usr_' + Math.random().toString(36).substring(2, 9),
-        email: cleanEmail,
-        name: cleanEmail.split('@')[0].replace(/[^a-zA-Z]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()).trim() || 'Candidate',
-        role: 'candidate',
-        provider: 'email',
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-        targetPaper: 'PAPER_II_MATH_SCI',
-        category: 'BC_MBC_SC_ST',
-        dailyMinutes: 35,
-        isVerified: true
-      };
-      users.push(newUser);
-      this.saveUsersRegistry(users);
-      this.setCurrentSession(newUser);
-      return newUser;
+      // Do NOT auto-provision accounts - require explicit registration
+      throw new Error('No account found with this email. Please register first.');
     }
 
     const updatedUser: AuthUser = {

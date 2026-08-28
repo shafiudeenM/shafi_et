@@ -9,7 +9,8 @@ import {
   SubjectId,
   MistakeQueueItem
 } from '../types';
-import { ALL_QUESTIONS, SUBJECT_METADATA, INITIAL_TOPIC_MASTERIES } from '../data/tntetData';
+import { SUBJECT_METADATA, INITIAL_TOPIC_MASTERIES } from '../data/tntetData';
+import { getQuestionBank } from './questionBankService';
 
 /**
  * Classifies the likely error type when a question is answered incorrectly
@@ -259,16 +260,17 @@ export function generateDailyPlan(
   };
 
   // Find questions for practice block
-  const topicQuestions = ALL_QUESTIONS.filter(q => q.topicId === targetTopic.topicId);
-  const otherQuestions = ALL_QUESTIONS.filter(q => q.topicId !== targetTopic.topicId);
+  const currentBank = getQuestionBank();
+  const topicQuestions = currentBank.filter(q => q.topicId === targetTopic.topicId);
+  const otherQuestions = currentBank.filter(q => q.topicId !== targetTopic.topicId);
   const practiceQuestions = [...topicQuestions, ...otherQuestions].slice(0, 15);
 
   let mistakeIds: string[] = [];
   if (Array.isArray(mistakesOrQuestions)) {
-    mistakeIds = mistakesOrQuestions.map((item: any) => (typeof item === 'string' ? item : item.question?.id || item.id || ALL_QUESTIONS[0].id));
+    mistakeIds = mistakesOrQuestions.map((item: any) => (typeof item === 'string' ? item : item.question?.id || item.id || currentBank[0].id));
   }
   const reviewQuestions = mistakeIds.slice(0, 3);
-  const quickCheckQuestions = ALL_QUESTIONS.slice(0, 5).map(q => q.id);
+  const quickCheckQuestions = currentBank.slice(0, 5).map(q => q.id);
   const scaleFactor = availableMinutes / 35;
 
   return {
@@ -313,7 +315,7 @@ export function generateDailyPlan(
 
     reviewBlock: {
       estimatedMinutes: Math.round(5 * scaleFactor),
-      mistakeQuestionIds: reviewQuestions.length > 0 ? reviewQuestions : [ALL_QUESTIONS[0].id],
+      mistakeQuestionIds: reviewQuestions.length > 0 ? reviewQuestions : [getQuestionBank()[0].id],
       isCompleted: false,
     },
 
