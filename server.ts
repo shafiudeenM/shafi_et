@@ -1,14 +1,13 @@
 import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
-import { GoogleGenAI } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
 
 dotenv.config();
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/auto';
 const AI_RATE_LIMIT_PER_MINUTE = parseInt(process.env.AI_RATE_LIMIT_PER_MINUTE || '30', 10);
 
 app.use(express.json());
@@ -40,25 +39,51 @@ function rateLimitMiddleware(req: express.Request, res: express.Response, next: 
   next();
 }
 
-// Initialize Gemini SDK with server-side API key
-let aiClient: GoogleGenAI | null = null;
-function getGeminiClient(): GoogleGenAI {
-  if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      console.warn('GEMINI_API_KEY is not set in environment. Mocking fallback or using rule-based reasoning.');
-    }
-    aiClient = new GoogleGenAI({
-      apiKey: apiKey || 'dummy-key',
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
-        },
-      },
-    });
+// OpenRouter client (OpenAI-compatible) using server-side API key.
+const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+
+type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string };
+
+async function openRouterChat(
+  messages: ChatMessage[],
+  opts: { json?: boolean; maxTokens?: number } = {}
+): Promise<string> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENROUTER_API_KEY is not set in environment.');
   }
-  return aiClient;
+
+  const body: any = {
+    model: OPENROUTER_MODEL,
+    messages,
+  };
+  if (opts.json) body.response_format = { type: 'json_object' };
+  if (opts.maxTokens) body.max_tokens = opts.maxTokens;
+
+  const res = await fetch(OPENROUTER_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+      'HTTP-Referer': process.env.APP_URL || 'http://localhost:3000',
+      'X-Title': 'TNTET Personal Coach',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`OpenRouter request failed (${res.status}): ${detail}`);
+  }
+
+  const data = await res.json();
+  const content = data?.choices?.[0]?.message?.content;
+  if (typeof content !== 'string') {
+    throw new Error('OpenRouter returned no content.');
+  }
+  return content;
 }
+
 
 // Server-side response cache for AI queries to ensure instant responses, zero latency & $0 repeat cost
 const aiResponseCache = new Map<string, { reply: any; timestamp: number }>();
@@ -109,7 +134,7 @@ app.post('/api/tutor/explain', rateLimitMiddleware, async (req, res) => {
       return res.json({ success: true, data: cached, cached: true });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.OPENROUTER_API_KEY) {
       // Fallback deterministic response
       const fallbackData = {
         conceptExplanation: isTamil
@@ -133,7 +158,6 @@ app.post('/api/tutor/explain', rateLimitMiddleware, async (req, res) => {
       return res.json({ success: true, data: fallbackData });
     }
 
-    const ai = getGeminiClient();
     const systemPrompt = `You are an expert Tamil Nadu Teacher Eligibility Test (TNTET) Master Tutor and Child Pedagogy / Subject Specialist.
 You strictly adhere to Tamil Nadu State Board (SCERT) syllabus and official TRB TNTET exam standards.
 You explain concepts with high pedagogical clarity.
@@ -145,7 +169,7 @@ Output in structured JSON format with fields:
 - "trbKeyRule": one concise mnemonic or formula or golden rule for TRB exam.
 - "threeCheckQuestions": array of 3 short multiple choice questions to immediately verify understanding, each with question, options (4), and correctIndex (0-3), and shortExplanation.`;
 
-    const prompt = `Candidate missed the following TNTET question in subject "${subject}", topic "${topic}":
+    const userPrompt = `Candidate missed the following TNTET question in subject "${subject}", topic "${topic}":
 Question: "${question?.text || ''}"
 Candidate's Selected Option: "${selectedOption}"
 Correct Option: "${correctOption}"
@@ -153,16 +177,15 @@ Full Options: ${JSON.stringify(question?.options || [])}
 
 Please provide a targeted concept explanation and 3 quick check verification questions.`;
 
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: prompt,
-      config: {
-        systemInstruction: systemPrompt,
-        responseMimeType: 'application/json',
-      },
-    });
+    const content = await openRouterChat(
+      [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      { json: true }
+    );
 
-    const parsed = JSON.parse(response.text || '{}');
+    const parsed = JSON.parse(content);
     setCachedAIResponse(cacheKey, parsed);
     res.json({ success: true, data: parsed });
   } catch (error: any) {
@@ -201,7 +224,7 @@ app.post('/api/tutor/chat', rateLimitMiddleware, async (req, res) => {
       return res.json({ success: true, reply: cached, cached: true });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.OPENROUTER_API_KEY) {
       return res.json({
         success: true,
         reply: isTamil
@@ -210,22 +233,16 @@ app.post('/api/tutor/chat', rateLimitMiddleware, async (req, res) => {
       });
     }
 
-    const ai = getGeminiClient();
     const systemPrompt = `You are a personalized TNTET (Tamil Nadu Teacher Eligibility Test) AI Mentor.
 You only answer questions strictly related to the candidate's TNTET Paper I & Paper II syllabus (CDP, Tamil, English, Mathematics, Science, Social Science, EVS).
 Candidate context: Paper: ${context?.paper || 'Paper I'}, Target Subject: ${context?.subject || 'All'}, Current Weak Topic: ${context?.weakTopic || 'None'}.
 Language: ${isTamil ? 'Tamil (தமிழ்) with accurate educational terms' : 'English'}.
 Be concise, encouraging, and provide exam-oriented insights.`;
 
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: message,
-      config: {
-        systemInstruction: systemPrompt,
-      },
-    });
-
-    const replyText = response.text || (isTamil ? 'புரிந்தது. மேலும் கேட்கலாம்.' : 'Understood. Feel free to ask more.');
+    const replyText = await openRouterChat([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: message },
+    ]);
     setCachedAIResponse(cacheKey, replyText);
     res.json({ success: true, reply: replyText });
   } catch (error: any) {
@@ -247,7 +264,7 @@ app.post('/api/diagnose/prescribe', rateLimitMiddleware, async (req, res) => {
     const { results, paper, languageMode } = req.body;
     const isTamil = languageMode === 'tamil' || languageMode === 'bilingual';
 
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.OPENROUTER_API_KEY) {
       return res.json({
         success: true,
         prescription: isTamil
@@ -256,13 +273,14 @@ app.post('/api/diagnose/prescribe', rateLimitMiddleware, async (req, res) => {
       });
     }
 
-    const ai = getGeminiClient();
-    const response = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: `Candidate diagnostic score: ${JSON.stringify(results)} for ${paper}. Provide a 2-sentence actionable prescription for what to study today in ${isTamil ? 'Tamil' : 'English'}.`,
-    });
+    const prescription = await openRouterChat([
+      {
+        role: 'user',
+        content: `Candidate diagnostic score: ${JSON.stringify(results)} for ${paper}. Provide a 2-sentence actionable prescription for what to study today in ${isTamil ? 'Tamil' : 'English'}.`,
+      },
+    ]);
 
-    res.json({ success: true, prescription: response.text });
+    res.json({ success: true, prescription });
   } catch (error: any) {
     console.error('Error in /api/diagnose/prescribe:', error);
     res.status(500).json({ success: false, error: error.message });

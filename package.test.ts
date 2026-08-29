@@ -36,7 +36,6 @@ describe('Package Configuration', () => {
         'react',
         'react-dom',
         '@supabase/supabase-js',
-        '@google/genai',
         'express',
         'dotenv',
       ];
