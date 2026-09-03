@@ -32,6 +32,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     console.error('ErrorBoundary caught:', error, errorInfo);
     this.setState({ errorInfo });
 
+    // Forward to Sentry in production
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      import('@sentry/react').then((Sentry) => {
+        if (typeof Sentry?.captureException === 'function') {
+          Sentry.captureException(error, { contexts: { react: { componentStack: errorInfo.componentStack ?? '' } } });
+        }
+      }).catch(() => { /* Sentry not available — swallow */ });
+    } catch { /* guard */ }
+
     // Log error to console in development
     if (typeof import.meta !== 'undefined' && (import.meta as any).env?.DEV) {
       console.group('ErrorBoundary Details');

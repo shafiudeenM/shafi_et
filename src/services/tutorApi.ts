@@ -1,4 +1,8 @@
+/// <reference types="vite/client" />
 import { Question, LanguageMode } from '../types';
+
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const getEndpointUrl = (path: string) => `${API_BASE_URL}${path}`;
 
 export interface AITutorExplanationResponse {
   success: boolean;
@@ -25,7 +29,7 @@ export async function fetchAITutorExplanation(
   languageMode: LanguageMode
 ): Promise<AITutorExplanationResponse> {
   try {
-    const res = await fetch('/api/tutor/explain', {
+    const res = await fetch(getEndpointUrl('/api/tutor/explain'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -77,7 +81,7 @@ export async function fetchAITutorExplanation(
 
 export async function getTutorExplanation(topic: string, languageMode: LanguageMode): Promise<{ success: boolean; explanation?: any }> {
   try {
-    const res = await fetch('/api/tutor/chat', {
+    const res = await fetch(getEndpointUrl('/api/tutor/chat'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -118,7 +122,7 @@ export async function askTutorChat(
 ): Promise<string> {
   try {
     const latestUserMsg = messages[messages.length - 1]?.content || '';
-    const res = await fetch('/api/tutor/chat', {
+    const res = await fetch(getEndpointUrl('/api/tutor/chat'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -144,7 +148,7 @@ export async function sendAITutorChatMessage(
   languageMode: LanguageMode
 ): Promise<{ success: boolean; reply: string }> {
   try {
-    const res = await fetch('/api/tutor/chat', {
+    const res = await fetch(getEndpointUrl('/api/tutor/chat'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, context, languageMode }),
@@ -168,7 +172,7 @@ export async function fetchDiagnosticPrescription(
   languageMode: LanguageMode
 ): Promise<string> {
   try {
-    const res = await fetch('/api/diagnose/prescribe', {
+    const res = await fetch(getEndpointUrl('/api/diagnose/prescribe'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ results, paper, languageMode }),

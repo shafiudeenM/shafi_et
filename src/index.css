@@ -37,19 +37,19 @@
 }
 
 /* =========================================================
-   LIGHT MODE (ACADEMIC SLATE / HIGH-CONTRAST LIGHT)
+   LIGHT MODE (GOOGLE MATERIAL 3 DESIGN SYSTEM)
    ========================================================= */
 [data-theme="light"] {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
+  background-color: #f8f9fa !important;
+  color: #1f1f1f !important;
 }
 
 [data-theme="light"] body {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
+  background-color: #f8f9fa !important;
+  color: #1f1f1f !important;
 }
 
-/* App Backgrounds */
+/* App Backgrounds & Surface Cards */
 [data-theme="light"] .bg-\[\#0a0a0a\],
 [data-theme="light"] .bg-\[\#0d0d0d\],
 [data-theme="light"] .bg-\[\#121212\],
@@ -59,45 +59,47 @@
 [data-theme="light"] .bg-\[\#181818\],
 [data-theme="light"] .bg-\[\#1c1c1c\] {
   background-color: #ffffff !important;
+  box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.08), 0 4px 8px 3px rgba(60, 64, 67, 0.04) !important;
 }
 
 [data-theme="light"] .bg-\[\#0a0a0a\]\/95 {
-  background-color: rgba(255, 255, 255, 0.95) !important;
+  background-color: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(12px) !important;
 }
 
 [data-theme="light"] .bg-white\/\[0\.03\],
 [data-theme="light"] .bg-white\/\[0\.04\],
 [data-theme="light"] .bg-white\/\[0\.05\],
 [data-theme="light"] .bg-white\/5 {
-  background-color: #f1f5f9 !important;
+  background-color: #f1f3f4 !important;
 }
 
 [data-theme="light"] .bg-\[\#262626\],
 [data-theme="light"] .bg-\[\#2a2a2a\],
 [data-theme="light"] .bg-\[\#333333\] {
-  background-color: #e2e8f0 !important;
-  color: #0f172a !important;
+  background-color: #e8eaed !important;
+  color: #1f1f1f !important;
 }
 
-/* Borders */
+/* Google Material Borders */
 [data-theme="light"] .border-\[\#262626\],
 [data-theme="light"] .border-\[\#2a2a2a\],
 [data-theme="light"] .border-\[\#333333\],
 [data-theme="light"] .border-white\/10,
 [data-theme="light"] .border-white\/\[0\.06\],
 [data-theme="light"] .border-white\/\[0\.08\] {
-  border-color: #e2e8f0 !important;
+  border-color: #e0e3e7 !important;
 }
 
-/* Typography */
+/* Google Typography Hierarchy */
 [data-theme="light"] .text-white {
-  color: #0f172a !important;
+  color: #1f1f1f !important;
 }
 
 [data-theme="light"] .text-white\/90,
 [data-theme="light"] .text-white\/80,
 [data-theme="light"] .text-white\/70 {
-  color: #334155 !important;
+  color: #3c4043 !important;
 }
 
 [data-theme="light"] .text-white\/60,
@@ -105,52 +107,54 @@
 [data-theme="light"] .text-white\/40,
 [data-theme="light"] .text-\[\#a3a3a3\],
 [data-theme="light"] .text-\[\#737373\] {
-  color: #64748b !important;
+  color: #5f6368 !important;
 }
 
-/* Brand Accent & Logo Gradient Overrides */
+/* Google Primary Brand Accent (#1A73E8 Google Blue & #D97706 Warm Gold) */
 [data-theme="light"] .text-\[\#c5a059\] {
-  color: #2563eb !important;
+  color: #1a73e8 !important;
 }
 
 [data-theme="light"] .bg-\[\#c5a059\] {
-  background-color: #2563eb !important;
+  background-color: #1a73e8 !important;
   color: #ffffff !important;
 }
 
 [data-theme="light"] .bg-\[\#c5a059\]\/10,
 [data-theme="light"] .bg-\[\#c5a059\]\/15,
 [data-theme="light"] .bg-\[\#c5a059\]\/20 {
-  background-color: rgba(37, 99, 235, 0.1) !important;
+  background-color: #e8f0fe !important;
+  color: #1a73e8 !important;
 }
 
 [data-theme="light"] .border-\[\#c5a059\],
 [data-theme="light"] .border-\[\#c5a059\]\/30,
 [data-theme="light"] .border-\[\#c5a059\]\/40 {
-  border-color: #2563eb !important;
+  border-color: #1a73e8 !important;
 }
 
-/* Specific Logo and Header Accents in Light Mode */
+/* Google Material Gradients & Shadows */
 [data-theme="light"] .from-\[\#c5a059\] {
-  --tw-gradient-from: #2563eb !important;
-  --tw-gradient-to: #1d4ed8 !important;
+  --tw-gradient-from: #1a73e8 !important;
+  --tw-gradient-to: #0b57d0 !important;
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
 }
 
 [data-theme="light"] .to-\[\#8d6f30\] {
-  --tw-gradient-to: #1d4ed8 !important;
+  --tw-gradient-to: #0b57d0 !important;
 }
 
 [data-theme="light"] .from-\[\#c5a059\]\/20 {
-  --tw-gradient-from: rgba(37, 99, 235, 0.2) !important;
+  --tw-gradient-from: rgba(26, 115, 232, 0.15) !important;
 }
 
 [data-theme="light"] .to-\[\#8d6f30\]\/20 {
-  --tw-gradient-to: rgba(29, 78, 216, 0.2) !important;
+  --tw-gradient-to: rgba(11, 87, 208, 0.15) !important;
 }
 
 [data-theme="light"] .shadow-\[\#c5a059\]\/10,
 [data-theme="light"] .shadow-\[\#c5a059\]\/15,
 [data-theme="light"] .shadow-\[\#c5a059\]\/20 {
-  --tw-shadow-color: rgba(37, 99, 235, 0.15) !important;
+  --tw-shadow-color: rgba(26, 115, 232, 0.2) !important;
 }
+

@@ -2,8 +2,19 @@ import express from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
+import * as Sentry from '@sentry/node';
 
 dotenv.config();
+
+// ---------- Sentry Server Init ----------
+const sentryDsn = process.env.SENTRY_DSN || '';
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    tracesSampleRate: 1.0,
+  });
+  console.log('Sentry server-side error tracking enabled');
+}
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -11,6 +22,17 @@ const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'openrouter/auto';
 const AI_RATE_LIMIT_PER_MINUTE = parseInt(process.env.AI_RATE_LIMIT_PER_MINUTE || '30', 10);
 
 app.use(express.json());
+
+// Enable CORS for mobile app (Capacitor) and cross-origin requests
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Simple in-memory rate limiting for AI endpoints
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -286,6 +308,10 @@ app.post('/api/diagnose/prescribe', rateLimitMiddleware, async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// ---------- Sentry Express Error Handler ----------
+// Must be registered after all routes but before the SPA fallback
+Sentry.setupExpressErrorHandler(app);
 
 // Start Express and integrate Vite middleware
 async function start() {
