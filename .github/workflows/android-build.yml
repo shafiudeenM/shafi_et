@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,13 +18,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Using Node 20 LTS
+          node-version: 22
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17' # Android requires Java 17
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK Licenses
+        run: yes | sdkmanager --licenses || true
 
       - name: Install Dependencies
         run: npm ci
@@ -32,11 +38,10 @@ jobs:
       - name: Build Web App
         run: npm run build
         env:
-          # We provide dummy values here just so Vite can build successfully if it strictly requires them.
           VITE_API_URL: "https://shafi-et-sir4.onrender.com"
-          VITE_SUPABASE_URL: "https://dummy.supabase.co"
-          VITE_SUPABASE_ANON_KEY: "dummy"
-          VITE_SENTRY_DSN: "dummy"
+          VITE_SUPABASE_URL: "https://dchqmhxcggjtymctvbxe.supabase.co"
+          VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjaHFtaHhjZ2dqdHltY3R2YnhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMzU4ODYsImV4cCI6MjEwMjkxMTg4Nn0.u7-Q0fJGb74RgMs5cggIDvPqdEpP-Xy8EEsum0VWLe8"
+          VITE_SENTRY_DSN: "https://84fc088fce949f9e692f5bc38514a169@o4512023634247680.ingest.de.sentry.io/4512023641194576"
 
       - name: Sync Capacitor Android
         run: npx cap sync android
@@ -45,12 +50,14 @@ jobs:
         run: chmod +x ./android/gradlew
 
       - name: Build Android APK (Debug)
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --stacktrace
         working-directory: ./android
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
+        if: success()
         with:
-          name: app-debug.apk
+          name: app-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
+
