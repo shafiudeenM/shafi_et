@@ -159,11 +159,26 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ languageMode }) =>
       </div>
 
       {/* Health Status */}
-      <div className={`p-3 rounded-xl ${healthBg} border`}>
+      <div className={`p-3 rounded-xl ${healthBg} border mb-3`}>
         <p className={`text-[11px] font-semibold ${healthColor}`}>
           {isTamil ? health.messageTa : health.messageEn}
         </p>
       </div>
+
+      {/* WhatsApp Community Share Button */}
+      <button
+        onClick={() => {
+          const text = isTamil
+            ? `🔥 TNTET 2026 ஆசிரியர் தேர்வு பயிற்சி\n\n📌 எனது இன்றைய தொடர்: ${streakData.currentStreak} நாட்கள்\n⏱️ இன்றைய படிப்பு: ${streakData.todayMinutes} நிமிடங்கள் (${streakData.todayQuestions} வினாக்கள்)\n🎯 இலக்கு: 82+ தகுதி மதிப்பெண்\n\nஇணைந்து பயிற்சி பெற: ${window.location.origin}`
+            : `🔥 TNTET 2026 Teacher Exam Prep\n\n📌 Day Streak: ${streakData.currentStreak} Days\n⏱️ Today: ${streakData.todayMinutes} mins (${streakData.todayQuestions} questions solved)\n🎯 Target: Qualifying Marks (82+ / 90)\n\nPractice now: ${window.location.origin}`;
+          const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+          window.open(url, '_blank');
+        }}
+        className="w-full py-2.5 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-semibold text-xs flex items-center justify-center gap-2 transition shadow-sm"
+      >
+        <span className="text-sm">📱</span>
+        <span>{isTamil ? 'WhatsApp-ல் பகிர்க (Share Streak)' : 'Share Streak on WhatsApp'}</span>
+      </button>
 
       {/* Milestone Timeline */}
       <div className="mt-4 pt-3 border-t border-[#262626]">
