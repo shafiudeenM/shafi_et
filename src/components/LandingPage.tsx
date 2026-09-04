@@ -148,10 +148,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <span>
             {isTamil 
               ? 'தமிழ்நாடு ஆசிரியர் தகுதித் தேர்வு (Paper I & II) 2026 அறிவிப்பிற்கான பிரத்யேக தயாரிப்புத் தளம்' 
-              : 'Official TNTET 2026 Examination Preparation Portal • 100% Free Tier'}
+              : 'Official TNTET 2026 Examination Preparation Portal'}
           </span>
           <span className="hidden sm:inline text-[#c5a059] font-semibold underline cursor-pointer ml-1" onClick={() => onOpenAuth('signup')}>
-            {isTamil ? 'இலவசமாக சேரவும் →' : 'Enroll Free →'}
+            {isTamil ? 'இலவசமாக சேரவும் →' : 'Get Started →'}
           </span>
         </div>
       </div>
@@ -869,7 +869,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <span>• Tamil Nadu Teachers Recruitment Board (TRB) Alignment</span>
           </div>
           <div>
-            <span>100% Free Tier • SCERT Samacheer Kalvi Standards</span>
+            <span>SCERT Samacheer Kalvi Standards</span>
           </div>
         </div>
       </footer>

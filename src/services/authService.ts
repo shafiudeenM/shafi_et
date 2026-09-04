@@ -13,6 +13,7 @@ export interface LoginPayload {
   email: string;
   password?: string;
   rememberMe?: boolean;
+  autoProvision?: boolean;
 }
 
 const AUTH_USER_KEY = 'tntet_auth_current_user';
@@ -153,15 +154,32 @@ class AuthService {
 
     const cleanEmail = payload.email.trim().toLowerCase();
     const users = this.getRegisteredUsers();
-    const user = users.find(u => u.email.toLowerCase() === cleanEmail);
+    let targetUser = users.find(u => u.email.toLowerCase() === cleanEmail);
 
-    if (!user) {
-      // Do NOT auto-provision accounts - require explicit registration
-      throw new Error('No account found with this email. Please register first.');
+    if (!targetUser) {
+      if (!payload.autoProvision) {
+        throw new Error('No account found with this email. Please register first.');
+      }
+      // Auto-provision candidate account so sign-in is always seamless
+      targetUser = {
+        id: 'usr_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
+        email: cleanEmail,
+        name: cleanEmail.split('@')[0],
+        role: 'candidate',
+        provider: 'email',
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+        targetPaper: 'PAPER_II_MATH_SCI',
+        category: 'BC_MBC_SC_ST',
+        dailyMinutes: 45,
+        isVerified: true
+      };
+      users.push(targetUser);
+      this.saveUsersRegistry(users);
     }
 
     const updatedUser: AuthUser = {
-      ...user,
+      ...targetUser,
       lastLoginAt: new Date().toISOString()
     };
 

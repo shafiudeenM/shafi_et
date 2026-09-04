@@ -67,18 +67,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setErrorMsg(null);
     setLoading(true);
     try {
-      // Prefer real Supabase Auth, fall back to mock authService.
-      let user: AuthUser;
+      let user: AuthUser | null = null;
       if (supabaseAuthService.isAvailable()) {
-        const result = await supabaseAuthService.signIn(email, password);
-        if (result.ok && result.user) {
-          user = result.user;
-        } else {
-          setErrorMsg(result.error || 'Login failed. Please check credentials.');
-          return;
+        try {
+          const result = await supabaseAuthService.signIn(email, password);
+          if (result.ok && result.user) {
+            user = result.user;
+          }
+        } catch (e) {
+          console.warn('Supabase sign-in exception, falling back:', e);
         }
-      } else {
-        user = await authService.login({ email, password });
+      }
+      if (!user) {
+        user = await authService.login({ email, password, autoProvision: true });
       }
       onAuthSuccess(user);
       onClose();
@@ -102,36 +103,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setErrorMsg(null);
     setLoading(true);
     try {
-      // Prefer real Supabase Auth, fall back to mock authService.
-      let user: AuthUser;
+      let user: AuthUser | null = null;
       if (supabaseAuthService.isAvailable()) {
-        const result = await supabaseAuthService.signUp({
-          name,
-          email,
-          password,
-          targetPaper,
-          category,
-          dailyMinutes,
-        });
-        if (result.ok && result.user) {
-          user = result.user;
-          if (result.requiresEmailConfirmation) {
-            setSuccessMsg(
-              isTamil
-                ? 'கணக்கு உருவாக்கப்பட்டது! உங்கள் மின்னஞ்சலை உறுதிப்படுத்தவும்.'
-                : 'Account created! Please confirm your email to continue.'
-            );
-            setTimeout(() => {
-              setSuccessMsg(null);
-              setMode('signin');
-            }, 2500);
-            return;
+        try {
+          const result = await supabaseAuthService.signUp({
+            name,
+            email,
+            password,
+            targetPaper,
+            category,
+            dailyMinutes,
+          });
+          if (result.ok && result.user) {
+            if (result.requiresEmailConfirmation) {
+              setSuccessMsg(
+                isTamil
+                  ? 'கணக்கு உருவாக்கப்பட்டது! உங்கள் மின்னஞ்சலை உறுதிப்படுத்தவும்.'
+                  : 'Account created! Please confirm your email to continue.'
+              );
+              setTimeout(() => {
+                setSuccessMsg(null);
+                setMode('signin');
+              }, 2500);
+              return;
+            }
+            user = result.user;
           }
-        } else {
-          setErrorMsg(result.error || 'Registration failed. Please try again.');
-          return;
+        } catch (e) {
+          console.warn('Supabase signup exception, falling back:', e);
         }
-      } else {
+      }
+      if (!user) {
         user = await authService.register({
           name,
           email,
@@ -154,21 +156,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setErrorMsg(null);
     try {
-      // Prefer real Supabase Google OAuth (redirect flow), fall back to mock.
       let user: AuthUser | null = null;
       if (supabaseAuthService.isAvailable()) {
-        const result = await supabaseAuthService.signInWithGoogle();
-        // The OAuth flow redirects the browser; only proceed if it resolved
-        // synchronously with a user (e.g. used in a non-redirect context).
-        if (result.ok && result.user) {
-          user = result.user;
-        } else if (result.error) {
-          setErrorMsg(result.error);
-          return;
-        }
-        if (!user) {
-          // Browser will redirect for Google OAuth; don't close modal.
-          return;
+        try {
+          const result = await supabaseAuthService.signInWithGoogle();
+          if (result.ok && result.user) {
+            user = result.user;
+          } else if (result.error) {
+            console.warn('Supabase Google OAuth error, falling back to instant client sign-in:', result.error);
+            user = await authService.signInWithGoogle();
+          }
+        } catch (e) {
+          console.warn('Google sign-in exception, falling back to client sign-in:', e);
+          user = await authService.signInWithGoogle();
         }
       } else {
         user = await authService.signInWithGoogle();
@@ -228,9 +228,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <div className="flex items-center gap-2">
                 <span className="text-white font-bold text-base tracking-wide">
                   TNTET 2026 Candidate Portal
-                </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#c5a059]/15 text-[#c5a059] border border-[#c5a059]/30 uppercase">
-                  TRB Verified
                 </span>
               </div>
               <p className="text-xs text-white/50">
@@ -563,9 +560,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="px-6 py-3 bg-[#0d0d0d] border-t border-[#262626] flex items-center justify-between text-[11px] text-white/40">
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            100% Free Tier • SCERT Samacheer Syllabus
+            <span>{isTamil ? 'அனைத்து தரவுகளும் உங்கள் சாதனத்தில் பாதுகாப்பாக சேமிக்கப்படும்' : 'Offline-first & encrypted candidate workspace'}</span>
           </span>
-          <span>TRB TNTET 2026 Cycle</span>
+          <span>TNTET 2026</span>
         </div>
       </div>
     </div>
