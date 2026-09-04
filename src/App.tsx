@@ -50,6 +50,8 @@ const AITutorModal = React.lazy(() => import('./components/AITutorModal').then(m
 const PDFReportExportModal = React.lazy(() => import('./components/PDFReportExportModal').then(m => ({ default: m.PDFReportExportModal })));
 const CandidateProfileModal = React.lazy(() => import('./components/CandidateProfileModal').then(m => ({ default: m.CandidateProfileModal })));
 const IntegrationsModal = React.lazy(() => import('./components/IntegrationsModal').then(m => ({ default: m.IntegrationsModal })));
+import { MobileBottomNav } from './components/MobileBottomNav';
+import { MobileMoreSheet } from './components/MobileMoreSheet';
 const MobileExportModal = React.lazy(() => import('./components/MobileExportModal').then(m => ({ default: m.MobileExportModal })));
 import { dbSyncService } from './services/dbSyncService';
 import { authService } from './services/authService';
@@ -126,6 +128,7 @@ export default function App() {
 
   // State: Modals
   const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
+  const [isMobileMoreSheetOpen, setIsMobileMoreSheetOpen] = useState<boolean>(false);
   const [isPDFExportModalOpen, setIsPDFExportModalOpen] = useState<boolean>(false);
   const [isIntegrationsModalOpen, setIsIntegrationsModalOpen] = useState<boolean>(false);
   const [isMobileExportModalOpen, setIsMobileExportModalOpen] = useState<boolean>(false);
@@ -634,7 +637,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-4">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 space-y-4 pb-28 md:pb-8">
         <ErrorBoundary
           fallbackTitle="பகுதியில் பிழை / Section Error"
           fallbackMessage="இந்த பகுதியில் பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்."
@@ -845,11 +848,32 @@ export default function App() {
         onSaveProfile={handleSaveProfile}
       />
 
-      {/* Native Mobile Export (Capacitor APK) Modal */}
-      <MobileExportModal
-        isOpen={isMobileExportModalOpen}
-        onClose={() => setIsMobileExportModalOpen(false)}
+      {/* Native Mobile Bottom Navigation Bar */}
+      <MobileBottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenMoreSheet={() => setIsMobileMoreSheetOpen(true)}
+        isTamil={languageMode === 'tamil'}
+        mistakeCount={mistakeQueue.length}
+      />
+
+      {/* Native Mobile More Drawer Sheet */}
+      <MobileMoreSheet
+        isOpen={isMobileMoreSheetOpen}
+        onClose={() => setIsMobileMoreSheetOpen(false)}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        selectedPaper={selectedPaper}
+        onSelectPaper={handleSelectPaper}
         languageMode={languageMode}
+        onLanguageChange={setLanguageMode}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onOpenProfile={() => setIsProfileModalOpen(true)}
+        onOpenPDFExportModal={() => setIsPDFExportModalOpen(true)}
+        onOpenIntegrationsModal={() => setIsIntegrationsModalOpen(true)}
+        user={authUser}
+        onLogout={handleLogout}
       />
     </div>
     </Suspense>

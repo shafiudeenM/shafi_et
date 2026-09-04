@@ -110,9 +110,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0c0c0c]/95 backdrop-blur-md border-b border-[#222222] text-white shadow-xl">
+    <header className="sticky top-0 z-40 bg-[#0c0c0c]/95 backdrop-blur-md border-b border-[#222222] text-white shadow-xl" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       {/* Top Header Row */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between gap-3">
         {/* Brand */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#c5a059] to-[#8d6f30] flex items-center justify-center shadow-md shadow-[#c5a059]/15 text-black font-bold border border-[#c5a059]/40">
@@ -334,8 +334,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Clean Tab Bar */}
-      <div className="border-t border-white/[0.06] bg-[#0f0f0f]">
+      {/* Clean Tab Bar (Desktop Only - Mobile uses Bottom Navigation) */}
+      <div className="hidden md:block border-t border-white/[0.06] bg-[#0f0f0f]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex space-x-1 sm:space-x-2 overflow-x-auto py-1.5 scrollbar-none">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
