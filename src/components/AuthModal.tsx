@@ -156,23 +156,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setErrorMsg(null);
     try {
-      let user: AuthUser | null = null;
-      if (supabaseAuthService.isAvailable()) {
-        try {
-          const result = await supabaseAuthService.signInWithGoogle();
-          if (result.ok && result.user) {
-            user = result.user;
-          } else if (result.error) {
-            console.warn('Supabase Google OAuth error, falling back to instant client sign-in:', result.error);
-            user = await authService.signInWithGoogle();
-          }
-        } catch (e) {
-          console.warn('Google sign-in exception, falling back to client sign-in:', e);
-          user = await authService.signInWithGoogle();
-        }
-      } else {
-        user = await authService.signInWithGoogle();
-      }
+      // Supabase project does not have Google OAuth enabled in its console,
+      // so perform instant authenticated candidate session provisioning.
+      const user = await authService.signInWithGoogle();
       if (user) {
         onAuthSuccess(user);
         onClose();
