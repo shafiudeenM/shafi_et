@@ -3,12 +3,14 @@ import {
   Question, 
   SubjectId, 
   LanguageMode, 
-  ErrorType 
+  ErrorType,
+  PaperType 
 } from '../types';
 import { SUBJECT_METADATA } from '../data/tntetData';
 import { useQuestionBank, getQuestionBank } from '../services/questionBankService';
 import { classifyError } from '../services/recommendationEngine';
 import { triggerHaptic } from '../services/nativeMobileService';
+import { SCERTChapterSelector } from './SCERTChapterSelector';
 import { 
   Filter, 
   Search, 
@@ -26,12 +28,14 @@ import {
 
 interface PracticeViewProps {
   languageMode: LanguageMode;
+  selectedPaper?: PaperType;
   onOpenAITutor: (topicName: string) => void;
   onRecordAnswer: (question: Question, selectedIndex: number, isCorrect: boolean, timeSec: number, errorType?: ErrorType) => void;
 }
 
 export const PracticeView: React.FC<PracticeViewProps> = ({
   languageMode,
+  selectedPaper = 'PAPER_II_MATH_SCI',
   onOpenAITutor,
   onRecordAnswer,
 }) => {
@@ -40,6 +44,8 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
 
   const [selectedSubject, setSelectedSubject] = useState<SubjectId | 'all'>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
+  const [showChapterDrawer, setShowChapterDrawer] = useState(false);
   const [activeQuestionId, setActiveQuestionId] = useState<string>(getQuestionBank()[0].id);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
@@ -48,6 +54,7 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
   const filteredQuestions = questions.filter((q) => {
     if (selectedSubject !== 'all' && q.subject !== selectedSubject) return false;
     if (selectedDifficulty !== 'all' && q.difficulty !== selectedDifficulty) return false;
+    if (selectedTopicIds.length > 0 && !selectedTopicIds.includes(q.topicId)) return false;
     return true;
   });
 
@@ -133,8 +140,38 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
               <option value="Medium">Medium (நடுத்தரம்)</option>
               <option value="Hard">Hard (கடினம்)</option>
             </select>
+
+            {/* SCERT Chapter Filter Toggle */}
+            <button
+              onClick={() => setShowChapterDrawer(!showChapterDrawer)}
+              className={`px-3.5 py-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition ${
+                showChapterDrawer || selectedTopicIds.length > 0
+                  ? 'bg-[#c5a059] text-black border-[#c5a059] font-bold shadow-md'
+                  : 'bg-[#181818] border-[#262626] text-[#d4d4d4] hover:border-[#c5a059]/40'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>
+                {selectedTopicIds.length > 0 
+                  ? `${selectedTopicIds.length} ${isTamil ? 'பாடங்கள்' : 'Topics'}`
+                  : isTamil ? 'பாடநூல் இயல்கள்' : 'SCERT Chapters'
+                }
+              </span>
+            </button>
           </div>
         </div>
+
+        {/* Collapsible SCERT Chapter Selector */}
+        {showChapterDrawer && (
+          <div className="mt-4 pt-4 border-t border-[#262626] animate-fadeIn">
+            <SCERTChapterSelector
+              selectedPaper={selectedPaper}
+              languageMode={languageMode}
+              selectedTopicIds={selectedTopicIds}
+              onSelectTopics={setSelectedTopicIds}
+            />
+          </div>
+        )}
       </div>
 
       {/* Main Layout: Question Canvas & Question Navigator */}

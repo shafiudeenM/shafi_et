@@ -725,6 +725,7 @@ export default function App() {
         {activeTab === 'practice' && (
           <PracticeView
             languageMode={languageMode}
+            selectedPaper={selectedPaper}
             onOpenAITutor={handleOpenAITutor}
             onRecordAnswer={handleRecordAnswer}
           />
