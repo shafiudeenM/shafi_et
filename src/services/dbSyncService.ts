@@ -19,12 +19,20 @@ export interface SyncStatus {
   errorMessage: string | null;
 }
 
+type HydrationResult = {
+  profile: Partial<UserProfile> | null;
+  masteries: DbTopicMastery[];
+  mistakeQueue: DbMistakeQueue[];
+  dailyLogs: DbDailyStudyLog[];
+};
+
 class DatabaseSyncService {
   private userId: string | null = null;
   private masteryTimer: any = null;
   private mistakeTimer: any = null;
   private pendingMasteries: TopicMastery[] | null = null;
   private pendingMistakes: MistakeQueueItem[] | null = null;
+  private hydrationInFlight: Promise<HydrationResult> | null = null;
 
   /**
    * Set the authenticated user ID (called after Supabase Auth sign-in)
@@ -487,6 +495,10 @@ class DatabaseSyncService {
   /**
    * Hydrates local state from cloud on login.
    * Returns all user data needed to initialize the app.
+   *
+   * Concurrent calls share a single in-flight request, so a sign-in flow that
+   * triggers multiple hydrations (auth state change + App.tsx) never performs
+   * overlapping pulls that could race and clobber newer cloud/local rows.
    */
   public async hydrateFromCloud(): Promise<{
     profile: Partial<UserProfile> | null;
@@ -498,6 +510,17 @@ class DatabaseSyncService {
       return { profile: null, masteries: [], mistakeQueue: [], dailyLogs: [] };
     }
 
+    if (this.hydrationInFlight) {
+      return this.hydrationInFlight;
+    }
+
+    this.hydrationInFlight = this.doHydrate().finally(() => {
+      this.hydrationInFlight = null;
+    });
+    return this.hydrationInFlight;
+  }
+
+  private async doHydrate(): Promise<HydrationResult> {
     const [profile, masteries, mistakeQueue, dailyLogs] = await Promise.all([
       this.fetchUserProfile(),
       this.fetchTopicMasteries(),

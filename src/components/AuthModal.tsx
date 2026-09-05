@@ -64,21 +64,29 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setErrorMsg(isTamil ? 'மின்னஞ்சல் முகவரியை உள்ளிடவும்' : 'Please enter your email address');
       return;
     }
+    if (!password) {
+      setErrorMsg(isTamil ? 'கடவுச்சொல்லை உள்ளிடவும்' : 'Please enter your password');
+      return;
+    }
     setErrorMsg(null);
     setLoading(true);
     try {
       let user: AuthUser | null = null;
+
       if (supabaseAuthService.isAvailable()) {
-        try {
-          const result = await supabaseAuthService.signIn(email, password);
-          if (result.ok && result.user) {
-            user = result.user;
-          }
-        } catch (e) {
-          console.warn('Supabase sign-in exception, falling back:', e);
+        const result = await supabaseAuthService.signIn(email, password);
+        if (result.ok && result.user) {
+          user = result.user;
+        } else {
+          // Real Supabase auth failed — surface the error. Do NOT silently
+          // fall back to the offline mock (that would log anyone in).
+          setErrorMsg(result.error || (isTamil ? 'உள்நுழைவு தோல்வி. விவரங்களைச் சரிபார்க்கவும்.' : 'Sign-in failed. Please check your credentials.'));
+          return;
         }
       }
+
       if (!user) {
+        // Supabase not configured — use the local offline fallback.
         user = await authService.login({ email, password, autoProvision: true });
       }
       onAuthSuccess(user);
@@ -100,40 +108,48 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setErrorMsg(isTamil ? 'சரியான மின்னஞ்சலை உள்ளிடவும்' : 'Please enter a valid email address');
       return;
     }
+    if (!password || password.length < 8) {
+      setErrorMsg(isTamil ? 'கடவுச்சொல் குறைந்தது 8 எழுத்துகள் இருக்க வேண்டும்' : 'Password must be at least 8 characters');
+      return;
+    }
     setErrorMsg(null);
     setLoading(true);
     try {
       let user: AuthUser | null = null;
+
       if (supabaseAuthService.isAvailable()) {
-        try {
-          const result = await supabaseAuthService.signUp({
-            name,
-            email,
-            password,
-            targetPaper,
-            category,
-            dailyMinutes,
-          });
-          if (result.ok && result.user) {
-            if (result.requiresEmailConfirmation) {
-              setSuccessMsg(
-                isTamil
-                  ? 'கணக்கு உருவாக்கப்பட்டது! உங்கள் மின்னஞ்சலை உறுதிப்படுத்தவும்.'
-                  : 'Account created! Please confirm your email to continue.'
-              );
-              setTimeout(() => {
-                setSuccessMsg(null);
-                setMode('signin');
-              }, 2500);
-              return;
-            }
-            user = result.user;
+        const result = await supabaseAuthService.signUp({
+          name,
+          email,
+          password,
+          targetPaper,
+          category,
+          dailyMinutes,
+        });
+        if (result.ok && result.user) {
+          if (result.requiresEmailConfirmation) {
+            setSuccessMsg(
+              isTamil
+                ? 'கணக்கு உருவாக்கப்பட்டது! உங்கள் மின்னஞ்சலை உறுதிப்படுத்தவும்.'
+                : 'Account created! Please confirm your email to continue.'
+            );
+            setTimeout(() => {
+              setSuccessMsg(null);
+              setMode('signin');
+            }, 2500);
+            return;
           }
-        } catch (e) {
-          console.warn('Supabase signup exception, falling back:', e);
+          user = result.user;
+        } else {
+          // Real Supabase auth failed — surface the error. Do NOT silently
+          // create a local mock account (that would bypass real validation).
+          setErrorMsg(result.error || (isTamil ? 'பதிவு தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.' : 'Registration failed. Please try again.'));
+          return;
         }
       }
+
       if (!user) {
+        // Supabase not configured — use the local offline fallback.
         user = await authService.register({
           name,
           email,
@@ -156,15 +172,48 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     setErrorMsg(null);
     try {
-      // Supabase project does not have Google OAuth enabled in its console,
-      // so perform instant authenticated candidate session provisioning.
+      // 1. Prefer real Supabase Google OAuth when the project has it enabled.
+      if (supabaseAuthService.isAvailable()) {
+        const result = await supabaseAuthService.signInWithGoogle();
+
+        if (result.ok && result.redirecting) {
+          // Browser is being redirected to Google; the modal closes and the
+          // OAuth callback (session restore in App.tsx) finishes the login.
+          onClose();
+          return;
+        }
+
+        if (result.ok && result.user) {
+          onAuthSuccess(result.user);
+          onClose();
+          return;
+        }
+
+        // Real OAuth failed. Only fall through to the offline instant Google
+        // when the provider is genuinely unavailable; otherwise show the error.
+        if (!result.providerUnavailable) {
+          setErrorMsg(
+            result.error ||
+              (isTamil
+                ? 'Google உள்நுழைவு தோல்வி. மீண்டும் முயற்சிக்கவும்.'
+                : 'Google sign-in failed. Please try again or use email.')
+          );
+          return;
+        }
+      }
+
+      // 2. Fallback: instant candidate session (Supabase Google disabled).
       const user = await authService.signInWithGoogle();
       if (user) {
         onAuthSuccess(user);
         onClose();
       }
     } catch (err: any) {
-      setErrorMsg('Google Sign-In authentication error. Please try again or use email.');
+      setErrorMsg(
+        isTamil
+          ? 'Google உள்நுழைவு பிழை. மீண்டும் முயற்சிக்கவும் அல்லது மின்னஞ்சலைப் பயன்படுத்தவும்.'
+          : 'Google Sign-In authentication error. Please try again or use email.'
+      );
     } finally {
       setLoading(false);
     }

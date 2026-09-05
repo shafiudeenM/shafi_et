@@ -27,6 +27,10 @@ export interface SupabaseAuthResult {
   error?: string | null;
   user: AuthUser | null;
   requiresEmailConfirmation?: boolean;
+  /** True when the browser is being redirected to the OAuth provider. */
+  redirecting?: boolean;
+  /** True when the OAuth provider is disabled/unavailable in Supabase config. */
+  providerUnavailable?: boolean;
 }
 
 const toAuthUser = (email: string, name: string, provider: 'email' | 'google', targetPaper: PaperType, category: ReservationCategory, dailyMinutes: number, idSuffix?: string): AuthUser => {
@@ -43,6 +47,14 @@ const toAuthUser = (email: string, name: string, provider: 'email' | 'google', t
     dailyMinutes: dailyMinutes || 40,
     isVerified: true,
   };
+};
+
+/** Reads persisted user_metadata preferences, falling back to safe defaults. */
+const getProfilePrefs = (meta: Record<string, unknown> | undefined) => {
+  const category = (meta?.category as ReservationCategory) || (meta?.reservation_category as ReservationCategory) || 'BC_MBC_SC_ST';
+  const rawMinutes = Number(meta?.daily_minutes ?? meta?.dailyMinutes ?? NaN);
+  const dailyMinutes = Number.isFinite(rawMinutes) && rawMinutes > 0 ? Math.round(rawMinutes) : 40;
+  return { category, dailyMinutes };
 };
 
 class SupabaseAuthService {
@@ -66,7 +78,12 @@ class SupabaseAuthService {
         email: payload.email.trim().toLowerCase(),
         password: payload.password,
         options: {
-          data: { name: payload.name.trim(), target_paper: payload.targetPaper },
+          data: {
+            name: payload.name.trim(),
+            target_paper: payload.targetPaper,
+            category: payload.category,
+            daily_minutes: payload.dailyMinutes,
+          },
         },
       });
 
@@ -78,9 +95,11 @@ class SupabaseAuthService {
       const supabaseId = authUser?.id || null;
       const requiresConfirmation = Boolean(authUser && !data.session);
 
-      // Set user id immediately (even before email confirmation, we should
-      // not sync user data until the account is confirmed).
-      dbSyncService.setUserId(supabaseId);
+      // Only wire up sync once a confirmed session exists. An unconfirmed
+      // account has no session, so RLS-protected writes would fail silently.
+      if (data.session?.user?.id) {
+        dbSyncService.setUserId(data.session.user.id);
+      }
 
       const user = toAuthUser(
         payload.email.trim().toLowerCase(),
@@ -148,23 +167,20 @@ class SupabaseAuthService {
       // Pull metadata + profile for display.
       const meta = supabaseUser?.user_metadata || {};
       const name = (meta.name as string) || email.trim().split('@')[0];
+      const { category, dailyMinutes } = getProfilePrefs(meta);
 
       const user = toAuthUser(
         supabaseUser?.email || email.trim().toLowerCase(),
         name,
         'email',
         (meta.target_paper as PaperType) || 'PAPER_II_MATH_SCI',
-        'BC_MBC_SC_ST',
-        40,
+        category,
+        dailyMinutes,
         supabaseId || `email_${Date.now().toString(36)}`,
       );
 
-      // Hydrate cloud data on login.
-      try {
-        await dbSyncService.hydrateFromCloud();
-      } catch (e) {
-        console.warn('Supabase hydrateFromCloud after sign-in failed:', e);
-      }
+      // NOTE: cloud hydration is handled centrally by the caller (App.tsx
+      // handleAuthSuccess) to avoid concurrent/raced pulls.
 
       return { ok: true, error: null, user };
     } catch (err: any) {
@@ -174,28 +190,35 @@ class SupabaseAuthService {
 
   /**
    * Initiates Google OAuth flow via Supabase redirect.
-   * Returns ok=false if the flow must be handled by the caller.
+   *
+   * Returns `{ ok: true, redirecting: true }` once the browser starts the
+   * redirect (the caller should not attempt any further login). Returns
+   * `{ ok: false, providerUnavailable: true }` when the Google provider is
+   * disabled in the Supabase project, so the caller can fall back gracefully.
    */
   public async signInWithGoogle(): Promise<SupabaseAuthResult> {
     const supabase = getSupabase();
     if (!supabase) {
-      return { ok: false, error: 'Supabase is not configured. Using offline Google sign-in.', user: null };
+      return { ok: false, error: 'Supabase is not configured.', user: null, providerUnavailable: true };
     }
 
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: window.location.origin + window.location.pathname,
         },
       });
 
       if (error) {
-        return { ok: false, error: error.message, user: null };
+        const msg = error.message || '';
+        const providerUnavailable = /provider.*(not\s*enabled|is\s*not|disabled|missing|unsupported)/i.test(msg) || /google.*(enabled|configured)/i.test(msg);
+        return { ok: false, error: msg, user: null, providerUnavailable };
       }
 
-      // OAuth redirects the browser; if it does not, fall back to null.
-      return { ok: false, error: null, user: null };
+      // OAuth redirects the browser. Report success + redirecting so callers
+      // don't try to log the user in locally.
+      return { ok: true, error: null, user: null, redirecting: true };
     } catch (err: any) {
       return { ok: false, error: err.message || 'Google sign-in failed', user: null };
     }
@@ -218,14 +241,15 @@ class SupabaseAuthService {
 
       const meta = su?.user_metadata || {};
       const name = (meta.name as string) || (su?.email || '').split('@')[0];
+      const { category, dailyMinutes } = getProfilePrefs(meta);
 
       return toAuthUser(
         su?.email || '',
         name,
         (su?.app_metadata?.provider as 'google' | 'email') || 'email',
         (meta.target_paper as PaperType) || 'PAPER_II_MATH_SCI',
-        'BC_MBC_SC_ST',
-        40,
+        category,
+        dailyMinutes,
         su?.id || `session_${Date.now().toString(36)}`,
       );
     } catch (err) {
@@ -254,20 +278,19 @@ class SupabaseAuthService {
       if (su) {
         const meta = su.user_metadata || {};
         const name = (meta.name as string) || (su.email || '').split('@')[0];
+        const { category, dailyMinutes } = getProfilePrefs(meta);
         const user = toAuthUser(
           su.email || '',
           name,
           (su.app_metadata?.provider as 'google' | 'email') || 'email',
           (meta.target_paper as PaperType) || 'PAPER_II_MATH_SCI',
-          'BC_MBC_SC_ST',
-          40,
+          category,
+          dailyMinutes,
           su.id,
         );
         callback(user);
-        // Hydrate cloud data for this session without blocking UI.
-        dbSyncService.hydrateFromCloud().catch(e =>
-          console.warn('Supabase hydrateFromCloud failed:', e),
-        );
+        // NOTE: cloud hydration is handled centrally by App.tsx to avoid
+        // concurrent/raced pulls against the same cloud tables.
       } else {
         callback(null);
       }
