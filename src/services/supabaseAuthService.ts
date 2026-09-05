@@ -33,13 +33,27 @@ export interface SupabaseAuthResult {
   providerUnavailable?: boolean;
 }
 
-const toAuthUser = (email: string, name: string, provider: 'email' | 'google', targetPaper: PaperType, category: ReservationCategory, dailyMinutes: number, idSuffix?: string): AuthUser => {
+const nameFromMetadata = (meta: Record<string, unknown> | undefined, email: string): string => {
+  return (
+    (meta?.full_name as string) ||
+    (meta?.name as string) ||
+    (email || '').split('@')[0] ||
+    'Candidate'
+  );
+};
+
+const avatarFromMetadata = (meta: Record<string, unknown> | undefined): string | undefined => {
+  return (meta?.picture as string) || (meta?.avatar_url as string) || (meta?.avatarUrl as string) || undefined;
+};
+
+const toAuthUser = (email: string, name: string, provider: 'email' | 'google', targetPaper: PaperType, category: ReservationCategory, dailyMinutes: number, idSuffix?: string, avatarUrl?: string): AuthUser => {
   return {
     id: idSuffix || `${provider}_${Date.now().toString(36)}`,
     email,
     name,
     role: 'candidate',
     provider,
+    avatarUrl,
     createdAt: new Date().toISOString(),
     lastLoginAt: new Date().toISOString(),
     targetPaper,
@@ -240,7 +254,7 @@ class SupabaseAuthService {
       dbSyncService.setUserId(su?.id || null);
 
       const meta = su?.user_metadata || {};
-      const name = (meta.name as string) || (su?.email || '').split('@')[0];
+      const name = nameFromMetadata(meta, su?.email || '');
       const { category, dailyMinutes } = getProfilePrefs(meta);
 
       return toAuthUser(
@@ -251,6 +265,7 @@ class SupabaseAuthService {
         category,
         dailyMinutes,
         su?.id || `session_${Date.now().toString(36)}`,
+        avatarFromMetadata(meta),
       );
     } catch (err) {
       console.warn('Supabase getSessionUser exception:', err);
@@ -277,7 +292,7 @@ class SupabaseAuthService {
 
       if (su) {
         const meta = su.user_metadata || {};
-        const name = (meta.name as string) || (su.email || '').split('@')[0];
+        const name = nameFromMetadata(meta, su.email || '');
         const { category, dailyMinutes } = getProfilePrefs(meta);
         const user = toAuthUser(
           su.email || '',
@@ -287,6 +302,7 @@ class SupabaseAuthService {
           category,
           dailyMinutes,
           su.id,
+          avatarFromMetadata(meta),
         );
         callback(user);
         // NOTE: cloud hydration is handled centrally by App.tsx to avoid

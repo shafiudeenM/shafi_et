@@ -269,6 +269,8 @@ export default function App() {
 
   const userProfile: UserProfile = {
     ...DEFAULT_USER_PROFILE,
+    name: authUser?.name || DEFAULT_USER_PROFILE.name,
+    email: authUser?.email || undefined,
     selectedPaper,
     languageMode,
     category,
