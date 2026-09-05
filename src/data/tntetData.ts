@@ -768,14 +768,30 @@ export const ALL_QUESTIONS: Question[] = [
 ];
 
 export const DEFAULT_USER_PROFILE = {
-  name: 'Selvi M.',
+  name: 'Candidate',
   selectedPaper: 'PAPER_II_MATH_SCI' as const,
   languageMode: 'bilingual' as const,
   persona: 'working_candidate' as const,
   category: 'BC_MBC_SC_ST' as const,
   dailyStudyMinutes: 40,
-  hasCompletedDiagnostic: true,
-  joinedDate: 'July 2026',
-  streakDays: 6,
+  hasCompletedDiagnostic: false,
+  joinedDate: new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+  streakDays: 0,
 };
+
+/**
+ * The complete TNTET syllabus skeleton with every metric reset to zero.
+ * Used as the honest starting point for brand-new users so the dashboard
+ * reflects real performance instead of pre-seeded demo progress.
+ */
+export const EMPTY_TOPIC_MASTERIES: TopicMastery[] = INITIAL_TOPIC_MASTERIES.map((topic) => ({
+  ...topic,
+  masteryPercent: 0,
+  status: 'weak',
+  totalAttempted: 0,
+  correctCount: 0,
+  avgTimePerQuestionSec: 0,
+  dominantErrorType: undefined,
+  subconcepts: (topic.subconcepts || []).map((sc) => ({ ...sc, masteryPercent: 0 })),
+}));
 

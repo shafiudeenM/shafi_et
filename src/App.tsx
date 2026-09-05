@@ -14,12 +14,11 @@ import {
   AuthUser
 } from './types';
 import { 
-  INITIAL_TOPIC_MASTERIES, 
-  DEFAULT_USER_PROFILE 
+  DEFAULT_USER_PROFILE,
+  EMPTY_TOPIC_MASTERIES 
 } from './data/tntetData';
 import {
   useQuestionBank,
-  getQuestionBank,
   getQuestionById,
   initQuestionBank,
 } from './services/questionBankService';
@@ -32,6 +31,7 @@ import { Navbar } from './components/Navbar';
 import { LandingPage } from './components/LandingPage';
 import { AuthModal } from './components/AuthModal';
 import { DashboardView } from './components/DashboardView';
+import { DashboardOnboarding } from './components/DashboardOnboarding';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Heavier, non-initial views are lazy-loaded so the initial bundle (dashboard)
@@ -136,7 +136,7 @@ export default function App() {
   // State: Topic Masteries (TopicMastery[])
   const [topicMasteries, setTopicMasteries] = useState<TopicMastery[]>(() => {
     const saved = localStorage.getItem('tntet_topic_masteries');
-    return saved ? JSON.parse(saved) : INITIAL_TOPIC_MASTERIES;
+    return saved ? JSON.parse(saved) : EMPTY_TOPIC_MASTERIES;
   });
 
   // State: User Interactions
@@ -145,70 +145,20 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // State: Diagnostic completion (drives the first-run onboarding dashboard)
+  const [hasCompletedDiagnostic, setHasCompletedDiagnostic] = useState<boolean>(() => {
+    return localStorage.getItem('tntet_diagnostic_done') === '1';
+  });
+
   // State: Mistake Queue
   const [mistakeQueue, setMistakeQueue] = useState<MistakeQueueItem[]>(() => {
     const saved = localStorage.getItem('tntet_mistakes');
-    if (saved) return JSON.parse(saved);
-
-    // Default sample mistake queue
-    return [
-      {
-        id: 'mq_1',
-        question: getQuestionBank()[0],
-        lastInteraction: {
-          id: 'int_sample_1',
-          questionId: getQuestionBank()[0].id,
-          selectedOptionIndex: 1,
-          isCorrect: false,
-          timeSpentSec: 42,
-          confidence: 'medium',
-          detectedErrorType: 'concept_confusion',
-          timestamp: Date.now() - 86400000,
-          testContext: 'daily_practice',
-        },
-        retestCount: 1,
-        isResolved: false,
-      },
-      {
-        id: 'mq_2',
-        question: getQuestionBank()[1],
-        lastInteraction: {
-          id: 'int_sample_2',
-          questionId: getQuestionBank()[1].id,
-          selectedOptionIndex: 3,
-          isCorrect: false,
-          timeSpentSec: 28,
-          confidence: 'low',
-          detectedErrorType: 'knowledge_gap',
-          timestamp: Date.now() - 172800000,
-          testContext: 'daily_practice',
-        },
-        retestCount: 2,
-        isResolved: false,
-      },
-      {
-        id: 'mq_3',
-        question: getQuestionBank()[2],
-        lastInteraction: {
-          id: 'int_sample_3',
-          questionId: getQuestionBank()[2].id,
-          selectedOptionIndex: 0,
-          isCorrect: false,
-          timeSpentSec: 15,
-          confidence: 'high',
-          detectedErrorType: 'misread_question',
-          timestamp: Date.now() - 259200000,
-          testContext: 'full_simulation',
-        },
-        retestCount: 1,
-        isResolved: false,
-      },
-    ];
+    return saved ? JSON.parse(saved) : [];
   });
 
   // State: Daily Plan
   const [dailyPlan, setDailyPlan] = useState<DailySessionPlan>(() => {
-    return generateDailyPlan(INITIAL_TOPIC_MASTERIES, mistakeQueue, availableDailyMinutes);
+    return generateDailyPlan(EMPTY_TOPIC_MASTERIES, mistakeQueue, availableDailyMinutes);
   });
 
   // State: AI Tutor Modal
@@ -255,6 +205,10 @@ export default function App() {
   }, [targetExamDate]);
 
   useEffect(() => {
+    localStorage.setItem('tntet_diagnostic_done', hasCompletedDiagnostic ? '1' : '0');
+  }, [hasCompletedDiagnostic]);
+
+  useEffect(() => {
     localStorage.setItem('tntet_theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
     document.body.setAttribute('data-theme', theme);
@@ -271,6 +225,7 @@ export default function App() {
     ...DEFAULT_USER_PROFILE,
     name: authUser?.name || DEFAULT_USER_PROFILE.name,
     email: authUser?.email || undefined,
+    hasCompletedDiagnostic,
     selectedPaper,
     languageMode,
     category,
@@ -279,12 +234,19 @@ export default function App() {
     theme,
   };
 
+  // Fresh users haven't completed a diagnostic and have no practice history yet:
+  // show the simple onboarding dashboard instead of the full analytics stack.
+  const isFreshUser =
+    !hasCompletedDiagnostic &&
+    userInteractions.length === 0 &&
+    topicMasteries.every((t) => (t.totalAttempted || 0) === 0);
+
   // Background sync candidate profile
   useEffect(() => {
     if (dbSyncService.isCloudConnected()) {
       dbSyncService.syncUserProfile(userProfile).catch(console.warn);
     }
-  }, [selectedPaper, languageMode, category, availableDailyMinutes, targetExamDate]);
+  }, [selectedPaper, languageMode, category, availableDailyMinutes, targetExamDate, hasCompletedDiagnostic]);
 
   // Initialize Supabase auth session + subscribe to auth state changes.
   // Wires up dbSyncService.setUserId() and hydrates cloud data on sign-in.
@@ -306,6 +268,7 @@ export default function App() {
           if (cloud.profile.category) setCategory(cloud.profile.category);
           if (cloud.profile.dailyStudyMinutes) setAvailableDailyMinutes(cloud.profile.dailyStudyMinutes);
           if (cloud.profile.targetExamDate) setTargetExamDate(cloud.profile.targetExamDate);
+          if (cloud.profile.hasCompletedDiagnostic) setHasCompletedDiagnostic(true);
         }
         if (cloud.masteries) setTopicMasteries((prev) => mergeMasteries(prev, cloud.masteries));
         if (cloud.mistakeQueue) setMistakeQueue((prev) => mergeMistakeQueue(prev, cloud.mistakeQueue));
@@ -429,6 +392,7 @@ export default function App() {
   const handleCompleteDiagnostic = (interactions: UserInteraction[]) => {
     const nextInteractions = [...userInteractions, ...interactions];
     setUserInteractions(nextInteractions);
+    setHasCompletedDiagnostic(true);
 
     // Record diagnostic study streak
     recordStudySession(0, interactions.length, interactions.filter(i => i.isCorrect).length);
@@ -523,6 +487,7 @@ export default function App() {
           if (cloud.profile.category) setCategory(cloud.profile.category);
           if (cloud.profile.dailyStudyMinutes) setAvailableDailyMinutes(cloud.profile.dailyStudyMinutes);
           if (cloud.profile.targetExamDate) setTargetExamDate(cloud.profile.targetExamDate);
+          if (cloud.profile.hasCompletedDiagnostic) setHasCompletedDiagnostic(true);
         }
 
         if (cloud.masteries) {
@@ -670,7 +635,16 @@ export default function App() {
           }
           return null;
         })()}
-        {activeTab === 'dashboard' && (
+        {activeTab === 'dashboard' && isFreshUser && (
+          <DashboardOnboarding
+            name={userProfile.name}
+            isTamil={languageMode === 'tamil'}
+            onStartDiagnostic={() => setActiveTab('diagnostic')}
+            onStartDailyPlan={() => setActiveTab('daily_plan')}
+          />
+        )}
+
+        {activeTab === 'dashboard' && !isFreshUser && (
           <DashboardView
             readiness={readiness}
             topicMasteries={topicMasteries}
