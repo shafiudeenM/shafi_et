@@ -865,7 +865,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         selectedPaper={selectedPaper}
-        onSelectPaper={handleSelectPaper}
+        onSelectPaper={setSelectedPaper}
         languageMode={languageMode}
         onLanguageChange={setLanguageMode}
         theme={theme}
