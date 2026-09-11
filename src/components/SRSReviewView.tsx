@@ -116,15 +116,15 @@ export const SRSReviewView: React.FC<SRSReviewViewProps> = ({
           <div className="grid grid-cols-3 gap-4 max-w-sm mx-auto mt-6">
             <div className="p-3 rounded-xl bg-[#181818] border border-[#262626]">
               <div className="text-lg font-serif font-bold text-white">{sessionStats.reviewed}</div>
-              <span className="text-[9px] text-[#737373]">{isTamil ? 'மீள்பார்வை' : 'Reviewed'}</span>
+              <span className="text-[9px] text-[#8f8f8f]">{isTamil ? 'மீள்பார்வை' : 'Reviewed'}</span>
             </div>
             <div className="p-3 rounded-xl bg-[#181818] border border-[#262626]">
               <div className="text-lg font-serif font-bold text-[#4ade80]">{sessionStats.correct}</div>
-              <span className="text-[9px] text-[#737373]">{isTamil ? 'சரி' : 'Correct'}</span>
+              <span className="text-[9px] text-[#8f8f8f]">{isTamil ? 'சரி' : 'Correct'}</span>
             </div>
             <div className="p-3 rounded-xl bg-[#181818] border border-[#262626]">
               <div className="text-lg font-serif font-bold text-[#c5a059]">{accuracy}%</div>
-              <span className="text-[9px] text-[#737373]">{isTamil ? 'திறன்' : 'Accuracy'}</span>
+              <span className="text-[9px] text-[#8f8f8f]">{isTamil ? 'திறன்' : 'Accuracy'}</span>
             </div>
           </div>
           <button
@@ -192,19 +192,19 @@ export const SRSReviewView: React.FC<SRSReviewViewProps> = ({
 
       {/* SRS Info Bar */}
       <div className="flex items-center gap-3 px-1">
-        <div className="flex items-center gap-1.5 text-[10px] text-[#737373]">
+        <div className="flex items-center gap-1.5 text-[10px] text-[#8f8f8f]">
           <Clock className="w-3 h-3" />
           <span>
             {isTamil ? 'அடுத்த மீள்பார்வை' : 'Next Review'}: {nextReviewDays} {isTamil ? 'நாள்' : 'days'}
           </span>
         </div>
-        <div className="flex items-center gap-1.5 text-[10px] text-[#737373]">
+        <div className="flex items-center gap-1.5 text-[10px] text-[#8f8f8f]">
           <Zap className="w-3 h-3" />
           <span>
             {isTamil ? 'திறன்' : 'Ease'}: {currentSRS.easeFactor.toFixed(1)}
           </span>
         </div>
-        <div className="flex items-center gap-1.5 text-[10px] text-[#737373]">
+        <div className="flex items-center gap-1.5 text-[10px] text-[#8f8f8f]">
           <span>🔥 {currentSRS.currentStreak}</span>
         </div>
       </div>
@@ -323,7 +323,7 @@ export const SRSReviewView: React.FC<SRSReviewViewProps> = ({
 
       {/* SRS Stats Summary */}
       <div className="bg-[#181818] border border-[#262626] rounded-xl p-4">
-        <div className="flex items-center justify-between text-[10px] text-[#737373]">
+        <div className="flex items-center justify-between text-[10px] text-[#8f8f8f]">
           <span>
             {isTamil ? 'மொத்தம்' : 'Total'}: {stats.totalItems} | {isTamil ? 'மீள்பார்வை' : 'Due'}: {stats.dueForReview}
           </span>

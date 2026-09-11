@@ -255,7 +255,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <span className="text-xl font-serif-luxury font-bold text-white">
                     {readiness.overallScore}%
                   </span>
-                  <span className="text-[8px] font-semibold text-white/40 uppercase tracking-wider">
+                  <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wider">
                     {isTamil ? 'தயார்நிலை' : 'Readiness'}
                   </span>
                 </div>
@@ -575,7 +575,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-rose-950/60 border border-rose-800/40 text-rose-300">
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-rose-950/60 border border-rose-800/40 text-rose-300">
                         {topic.subjectId.toUpperCase()}
                       </span>
                       <h4 className="text-xs font-semibold text-white">

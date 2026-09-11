@@ -646,7 +646,7 @@ export const CandidateProfileModal: React.FC<CandidateProfileModalProps> = ({
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Kavitha S."
+                    placeholder="e.g. Meena S."
                     className="w-full bg-[#181818] border border-[#2c2c2c] focus:border-[#c5a059] rounded-xl pl-9 pr-3.5 py-2.5 text-xs text-white placeholder-white/30 outline-none transition"
                   />
                 </div>

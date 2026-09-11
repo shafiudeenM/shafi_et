@@ -204,9 +204,9 @@ export const SCERTChapterSelector: React.FC<SCERTChapterSelectorProps> = ({
                           >
                             <div className="flex items-center gap-2">
                               {isChapExpanded ? (
-                                <ChevronDown className="w-3 h-3 text-[#737373]" />
+                                <ChevronDown className="w-3 h-3 text-[#8f8f8f]" />
                               ) : (
-                                <ChevronRight className="w-3 h-3 text-[#737373]" />
+                                <ChevronRight className="w-3 h-3 text-[#8f8f8f]" />
                               )}
                               <span className="text-[11px] font-semibold text-[#d4d4d4] text-left">
                                 {isTamil ? chapter.nameTa : chapter.nameEn}
@@ -251,7 +251,7 @@ export const SCERTChapterSelector: React.FC<SCERTChapterSelectorProps> = ({
                                     </div>
                                     {qCount > 0 && (
                                       <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
-                                        isSelected ? 'bg-[#c5a059]/20 text-[#c5a059]' : 'bg-[#262626] text-[#737373]'
+                                        isSelected ? 'bg-[#c5a059]/20 text-[#c5a059]' : 'bg-[#262626] text-[#8f8f8f]'
                                       }`}>
                                         {qCount}Q
                                       </span>

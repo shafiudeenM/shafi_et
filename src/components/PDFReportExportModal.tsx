@@ -159,7 +159,7 @@ export const PDFReportExportModal: React.FC<PDFReportExportModalProps> = ({
                   <Calendar className="w-3.5 h-3.5" />
                   <span>{diffDays} Days to Exam</span>
                 </div>
-                <div className="text-[11px] text-[#737373] mt-1">
+                <div className="text-[11px] text-[#8f8f8f] mt-1">
                   Target: {targetDateStr} • Active Streak: {userProfile.streakDays} Days
                 </div>
               </div>
@@ -173,7 +173,7 @@ export const PDFReportExportModal: React.FC<PDFReportExportModalProps> = ({
                     {isTamil ? 'கணிக்கப்பட்ட தேர்வு மதிப்பெண்' : 'Projected Official TRB Score'}
                   </span>
                   <div className="text-3xl sm:text-4xl font-serif font-bold text-[#c5a059] mt-1">
-                    {readiness.projectedMarks} <span className="text-lg text-[#737373] font-normal">/ 150</span>
+                    {readiness.projectedMarks} <span className="text-lg text-[#8f8f8f] font-normal">/ 150</span>
                   </div>
                   <div className="text-xs text-[#a3a3a3] mt-1">
                     {isTamil ? 'தேவையான தகுதி வரம்பு:' : 'Official Qualifying Cutoff:'}{' '}

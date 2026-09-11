@@ -106,7 +106,7 @@ export const DailyPlanProgressTracker: React.FC<DailyPlanProgressTrackerProps> =
               {block.completed ? <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" /> : null}
               <span>{isTamil ? block.nameTa : block.nameEn}</span>
             </div>
-            <div className="text-[8px] text-white/40">{block.mins}m</div>
+            <div className="text-[10px] text-white/40">{block.mins}m</div>
           </div>
         ))}
       </div>

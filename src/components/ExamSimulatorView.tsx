@@ -220,7 +220,7 @@ export const ExamSimulatorView: React.FC<ExamSimulatorViewProps> = ({
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
                 <span className="text-[10px] text-[#a3a3a3] font-bold uppercase tracking-wider">{isTamil ? 'மதிப்பெண்' : 'Score'}</span>
                 <div className="text-2xl font-serif font-bold text-[#c5a059] mt-0.5">{correctCount} / {total}</div>
-                <span className="text-[11px] text-[#737373]">{pct}%</span>
+                <span className="text-[11px] text-[#8f8f8f]">{pct}%</span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
@@ -228,7 +228,7 @@ export const ExamSimulatorView: React.FC<ExamSimulatorViewProps> = ({
                 <div className={`text-base font-serif font-bold mt-0.5 ${isPassed ? 'text-[#4ade80]' : 'text-[#fca5a5]'}`}>
                   {isPassed ? (isTamil ? 'தகுதி பெற்றது' : 'Qualified') : (isTamil ? 'தகுதி பெறவில்லை' : 'Below Cutoff')}
                 </div>
-                <span className="text-[11px] text-[#737373]">{pct - qualifyingCutoff >= 0 ? `+${pct - qualifyingCutoff}% margin` : `${pct - qualifyingCutoff}% margin`}</span>
+                <span className="text-[11px] text-[#8f8f8f]">{pct - qualifyingCutoff >= 0 ? `+${pct - qualifyingCutoff}% margin` : `${pct - qualifyingCutoff}% margin`}</span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
@@ -242,7 +242,7 @@ export const ExamSimulatorView: React.FC<ExamSimulatorViewProps> = ({
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
                 <span className="text-[10px] text-[#a3a3a3] font-bold uppercase tracking-wider">{isTamil ? 'பயிற்சி செய்யாதவை' : 'Unattempted'}</span>
                 <div className="text-lg font-serif font-bold text-white mt-0.5">{total - Object.keys(answers).length}</div>
-                <span className="text-[11px] text-[#737373]">0 left unanswered</span>
+                <span className="text-[11px] text-[#8f8f8f]">0 left unanswered</span>
               </div>
             </div>
           </div>

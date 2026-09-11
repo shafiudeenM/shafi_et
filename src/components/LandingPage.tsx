@@ -116,8 +116,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     {
       qEn: 'What is the qualifying mark for TNTET 2026?',
       qTa: 'TNTET 2026 தேர்வில் தேர்ச்சி பெற எத்தனை மதிப்பெண்கள் தேவை?',
-      aEn: 'As per Tamil Nadu TRB norms, General / OC candidates must score at least 90 out of 150 (60%), while BC, BCM, MBC, DNC, SC, SCA, and ST candidates must score 82 out of 150 (55%). There is no sectional cutoff or negative marking.',
-      aTa: 'தமிழக ஆசிரியர் தேர்வு வாரிய (TRB) விதிகளின்படி, பொதுப் பிரிவினர் (OC) 150-க்கு 90 மதிப்பெண்களும் (60%), BC, BCM, MBC, SC, ST பிரிவினர் 150-க்கு 82 மதிப்பெண்களும் (55%) பெற வேண்டும். இதில் எதிர்மறை மதிப்பெண்கள் (Negative Marks) கிடையாது.'
+      aEn: 'As per recent TNTET norms, General / OC candidates must score at least 90 out of 150 (60%), while BC, BCM, MBC, DNC, SC, SCA, and ST candidates must score 82 out of 150 (55%). There is no sectional cutoff or negative marking. Please confirm final cutoffs from the official TRB notification.',
+      aTa: 'தமிழக ஆசிரியர் தேர்வு விதிகளின்படி, பொதுப் பிரிவினர் (OC) 150-க்கு 90 மதிப்பெண்களும் (60%), BC, BCM, MBC, SC, ST பிரிவினர் 150-க்கு 82 மதிப்பெண்களும் (55%) பெற வேண்டும். இதில் எதிர்மறை மதிப்பெண்கள் (Negative Marks) கிடையாது. இறுதி நிலை மதிப்பெண்களை அதிகாரப்பூர்வ அறிவிப்பில் உறுதிப்படுத்தவும்.'
     },
     {
       qEn: 'Is TNTET certificate valid for a lifetime in Tamil Nadu?',
@@ -128,8 +128,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     {
       qEn: 'Are all questions authentic to TN SCERT Samacheer Kalvi textbooks?',
       qTa: 'கேள்விகள் அனைத்தும் தமிழ்நாடு சமச்சீர் கல்வி பாடப்புத்தகங்களின்படி உள்ளதா?',
-      aEn: 'Yes, 100% of our question bank, distractor notes, and topic classifications are curated directly from Tamil Nadu State Board (SCERT) textbooks from Class 1 to 10 with bilingual explanations.',
-      aTa: 'முற்றிலும் உண்மை! அனைத்துக் கேள்விகளும் 1 முதல் 10-ஆம் வகுப்பு வரையிலான தமிழ்நாடு SCERT சமச்சீர் கல்விப் பாடத்திட்டம் மற்றும் TRB முந்தைய ஆண்டு வினாத்தாள்களை அடிப்படையாகக் கொண்டவை.'
+      aEn: 'Our question bank is built around the Tamil Nadu State Board (SCERT) Class 1 to 10 syllabus and past exam patterns, with bilingual Tamil–English explanations.',
+      aTa: 'அனைத்துக் கேள்விகளும் 1 முதல் 10-ஆம் வகுப்பு வரையிலான தமிழ்நாடு SCERT சமச்சீர் கல்விப் பாடத்திட்டம் மற்றும் முந்தைய ஆண்டு வினாத்தாள் வடிவங்களை அடிப்படையாகக் கொண்டவை.'
     },
     {
       qEn: 'How does the 35-minute adaptive daily session work?',
@@ -144,11 +144,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* 1. Top Global Announcement Bar */}
       <div className="bg-gradient-to-r from-[#181818] via-[#221c12] to-[#181818] border-b border-[#c5a059]/20 py-2 px-4 text-center text-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-white/90">
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#c5a059] text-black">TRB 2026</span>
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#c5a059] text-black">TNTET 2026</span>
           <span>
             {isTamil 
-              ? 'தமிழ்நாடு ஆசிரியர் தகுதித் தேர்வு (Paper I & II) 2026 அறிவிப்பிற்கான பிரத்யேக தயாரிப்புத் தளம்' 
-              : 'Official TNTET 2026 Examination Preparation Portal'}
+              ? 'TNTET 2026 (Paper I & II) தேர்விற்கான சுயாதீன (Unofficial) பயிற்சி மேடை' 
+              : 'Independent study companion for the TNTET 2026 (Paper I & II) exam'}
           </span>
           <span className="hidden sm:inline text-[#c5a059] font-semibold underline cursor-pointer ml-1" onClick={() => onOpenAuth('signup')}>
             {isTamil ? 'இலவசமாக சேரவும் →' : 'Get Started →'}
@@ -161,18 +161,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4">
           {/* Brand Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#c5a059] to-[#8d6f30] flex items-center justify-center shadow-lg shadow-[#c5a059]/15 text-black border border-[#c5a059]/40">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#c5a059] to-[#8d6f30] flex items-center justify-center shadow-lg shadow-[#c5a059]/15 text-black border border-[#c5a059]/40">
               <GraduationCap className="w-5 h-5 text-white dark:text-[#0a0a0a]" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-base tracking-wide text-white font-cinzel">TNTET</span>
                 <span className="text-xs text-[#c5a059] font-semibold italic">Coach</span>
                 <span className="hidden sm:inline-block px-1.5 py-0.2 rounded text-[9px] font-bold bg-[#c5a059]/15 text-[#c5a059] border border-[#c5a059]/30">
-                  SCERT 2026
+                  Syllabus Aligned
                 </span>
               </div>
-              <p className="text-[10px] text-white/50 tracking-wider">Tamil Nadu Teacher Eligibility Test</p>
+              <p className="hidden sm:block text-[10px] text-white/50 tracking-wider">Tamil Nadu Teacher Eligibility Test</p>
             </div>
           </div>
 
@@ -208,22 +208,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             )}
 
             {/* Language Switcher */}
-            <div className="flex items-center bg-[#181818] border border-[#2c2c2c] rounded-lg p-0.5 text-[11px]">
+            <div className="hidden md:flex items-center bg-[#181818] border border-[#2c2c2c] rounded-lg p-0.5 text-[11px]">
               <button
                 onClick={() => onLanguageChange('bilingual')}
-                className={`px-2 py-1 rounded transition ${languageMode === 'bilingual' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/60 hover:text-white'}`}
+                className={`px-2 py-1.5 rounded transition ${languageMode === 'bilingual' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/60 hover:text-white'}`}
               >
                 இருமொழி
               </button>
               <button
                 onClick={() => onLanguageChange('tamil')}
-                className={`px-2 py-1 rounded transition ${languageMode === 'tamil' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/60 hover:text-white'}`}
+                className={`px-2 py-1.5 rounded transition ${languageMode === 'tamil' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/60 hover:text-white'}`}
               >
                 தமிழ்
               </button>
               <button
                 onClick={() => onLanguageChange('english')}
-                className={`px-2 py-1 rounded transition ${languageMode === 'english' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/60 hover:text-white'}`}
+                className={`px-2 py-1.5 rounded transition ${languageMode === 'english' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/60 hover:text-white'}`}
               >
                 EN
               </button>
@@ -232,7 +232,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Dark / Light Mode Toggle */}
             <button
               onClick={onToggleTheme}
-              className="p-2 rounded-lg bg-[#181818] border border-[#2c2c2c] hover:border-[#c5a059]/40 text-[#c5a059] transition"
+              className="p-2.5 rounded-lg bg-[#181818] border border-[#2c2c2c] hover:border-[#c5a059]/40 text-[#c5a059] transition"
               title="Toggle Dark / Light Mode"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-[#c5a059]" /> : <Moon className="w-4 h-4 text-[#2563eb]" />}
@@ -241,7 +241,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Sign In Trigger */}
             <button
               onClick={() => onOpenAuth('signin')}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white/80 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition"
+              className="hidden md:inline-flex px-3 py-2 rounded-lg text-xs font-semibold text-white/80 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition"
             >
               {isTamil ? 'உள்நுழைக' : 'Sign In'}
             </button>
@@ -249,17 +249,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Primary Sign Up CTA */}
             <button
               onClick={() => onOpenAuth('signup')}
-              className="px-4 py-1.5 rounded-lg text-xs font-bold text-black bg-gradient-to-r from-[#c5a059] to-[#8d6f30] hover:from-[#d6b066] hover:to-[#9e7d37] shadow-md shadow-[#c5a059]/20 transition flex items-center gap-1.5"
+              className="px-4 py-2 rounded-lg text-xs font-bold text-black bg-gradient-to-r from-[#c5a059] to-[#8d6f30] hover:from-[#d6b066] hover:to-[#9e7d37] shadow-md shadow-[#c5a059]/20 transition flex items-center gap-1.5"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>{isTamil ? 'பதிவு செய்க' : 'Get Started'}</span>
             </button>
           </div>
         </div>
+
+        {/* Mobile Secondary Action Strip (Language + Sign In) */}
+        <div className="md:hidden flex items-center gap-2 px-3 pb-2 -mt-0.5">
+          <div className="flex items-center bg-[#181818] border border-[#2c2c2c] rounded-lg p-0.5 text-xs">
+            <button
+              onClick={() => onLanguageChange('bilingual')}
+              className={`px-2 py-1.5 rounded transition ${languageMode === 'bilingual' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/60 hover:text-white'}`}
+            >
+              இருமொழி
+            </button>
+            <button
+              onClick={() => onLanguageChange('tamil')}
+              className={`px-2 py-1.5 rounded transition ${languageMode === 'tamil' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/60 hover:text-white'}`}
+            >
+              தமிழ்
+            </button>
+            <button
+              onClick={() => onLanguageChange('english')}
+              className={`px-2 py-1.5 rounded transition ${languageMode === 'english' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/60 hover:text-white'}`}
+            >
+              EN
+            </button>
+          </div>
+          <button
+            onClick={() => onOpenAuth('signin')}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white/80 bg-white/[0.04] border border-white/10 transition"
+          >
+            {isTamil ? 'உள்நுழைக' : 'Sign In'}
+          </button>
+        </div>
       </header>
 
       {/* 3. Hero Section */}
-      <section className="relative pt-12 pb-20 px-4 sm:px-6 overflow-hidden">
+      <section id="features" className="relative pt-12 pb-20 px-4 sm:px-6 overflow-hidden">
         {/* Subtle Ambient Radial Glow */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-[#c5a059]/10 blur-[130px] rounded-full pointer-events-none"></div>
 
@@ -268,17 +298,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#181818] border border-[#c5a059]/30 text-xs text-[#c5a059] font-semibold">
               <Award className="w-4 h-4 text-[#c5a059]" />
-              <span>{isTamil ? 'தமிழ்நாடு SCERT 100% சமச்சீர் கல்வி பாடத்திட்டம்' : '100% SCERT Samacheer Kalvi Syllabus Aligned'}</span>
+              <span>{isTamil ? 'தமிழ்நாடு SCERT சமச்சீர் கல்வி பாடத்திட்டத்தின் அடிப்படையில்' : 'Built around the SCERT Samacheer Kalvi syllabus'}</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-[1.15] tracking-tight">
               {isTamil ? (
                 <>
-                  TNTET 2026 தேர்வில் முதல் முயற்சியிலேயே <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c5a059] via-[#e5c581] to-[#8d6f30]">தேர்ச்சி பெறுங்கள்</span>
+                  நம்பிக்கையுடன் TNTET 2026 தேர்விற்கு <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c5a059] via-[#e5c581] to-[#8d6f30]">தயாராகுங்கள்</span>
                 </>
               ) : (
                 <>
-                  Crack TNTET 2026 on Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c5a059] via-[#e5c581] to-[#8d6f30]">First Attempt</span>
+                  Prepare for TNTET 2026 with a <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#c5a059] via-[#e5c581] to-[#8d6f30]">Clear Daily Plan</span>
                 </>
               )}
             </h1>
@@ -286,7 +316,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <p className="text-sm sm:text-base text-white/70 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               {isTamil
                 ? 'தாள் 1 (தொடக்கப்பள்ளி) மற்றும் தாள் 2 (பட்டதாரி ஆசிரியர்) தேர்வுகளுக்கான பிரத்யேக வழிகாட்டி. 35 நிமிட தினசரி பயிற்சி, 150 நிமிட முழு மாதிரித் தேர்வு, 5 வகை பிழைப் பகுப்பாய்வு மற்றும் இருமொழி விளக்கம்.'
-                : 'Adaptive preparation system for Paper I (Primary 1–5) & Paper II (Graduate Teachers). Features 35-minute micro-plans, full 150-minute TRB simulators, 5-tier distractor diagnosis, and instant Tamil-first AI tutoring.'}
+                : 'Adaptive preparation system for Paper I (Primary 1–5) & Paper II (Graduate Teachers). Features 35-minute micro-plans, full 150-minute exam simulators, 5-tier distractor diagnosis, and instant Tamil-first AI tutoring.'}
             </p>
 
             {/* Key Trust Checkmarks */}
@@ -297,7 +327,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
               <div className="flex items-center gap-2 text-xs text-white/80">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>150-Minute TRB</strong> Exam Simulator</span>
+                <span><strong>150-Minute Full</strong> Exam Simulator</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-white/80">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -351,7 +381,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <span className="text-xs font-bold text-white uppercase tracking-wider">Live SCERT Question Preview</span>
                 </div>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#c5a059]/15 text-[#c5a059] border border-[#c5a059]/30">
-                  TRB Standard
+                  Exam Standard
                 </span>
               </div>
 
@@ -571,7 +601,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               {isTamil ? 'தாள் வாரியான பாடப்பிரிவுகள் மற்றும் மதிப்பெண் பகிர்வு' : 'Paper-Wise Syllabus & Marks Breakdown'}
             </h2>
             <p className="text-xs sm:text-sm text-white/60 max-w-xl mx-auto">
-              Authentic 150-mark structure prescribed by TRB Tamil Nadu.
+              150-mark structure following the TNTET exam pattern.
             </p>
           </div>
 
@@ -710,7 +740,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="w-10 h-10 rounded-lg bg-blue-500/15 text-blue-400 flex items-center justify-center font-bold">
                 <Target className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-white">150-Q TRB Simulator</h3>
+              <h3 className="text-sm font-bold text-white">150-Q Full Simulator</h3>
               <p className="text-xs text-white/60 leading-relaxed">
                 Exact 150-minute exam timer with OMR-style palette, answer review, and printable diagnostic PDF dossier.
               </p>
@@ -737,8 +767,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Candidate Feedback
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-              {isTamil ? 'ஆசிரியர் தேர்வர்களின் அனுபவங்கள்' : 'Trusted by TN Teacher Aspirants'}
+              {isTamil ? 'ஆசிரியர் தேர்வர்களுக்கான அனுபவ வடிவங்கள்' : 'Made for TN Teacher Aspirants'}
             </h2>
+            <p className="text-xs text-white/40 max-w-xl mx-auto">
+              {isTamil
+                ? 'கீழே உள்ளவை உதாரண பயன்பாட்டுக் காட்சிகள் (illustrative), நிஜ மாணவர் கருத்துகள் அல்ல.'
+                : 'The scenarios below are illustrative examples of how aspirants use the coach — not real student reviews.'}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -747,10 +782,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 {'★★★★★'.split('').map((s, i) => <span key={i}>{s}</span>)}
               </div>
               <p className="text-xs text-white/70 italic leading-relaxed">
-                "The 82-mark target calibration gave me clear confidence. The CDP explanation in Tamil solved my confusion in Piaget vs Vygotsky theories!"
+                "The 82-mark target calibration gives me clear confidence. The CDP explanation in Tamil cleared my confusion between Piaget vs Vygotsky theories."
               </p>
               <div className="pt-2 border-t border-white/10">
-                <div className="text-xs font-bold text-white">Kavitha Sundaram</div>
+                <div className="text-xs font-bold text-white">Teacher Aspirant</div>
                 <div className="text-[10px] text-white/50">Paper II (Maths & Science) • Madurai</div>
               </div>
             </div>
@@ -760,10 +795,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 {'★★★★★'.split('').map((s, i) => <span key={i}>{s}</span>)}
               </div>
               <p className="text-xs text-white/70 italic leading-relaxed">
-                "As a working parent, having a 35-minute daily plan with instant mistake retesting was a game changer. The 150-min exam simulator felt like the real TRB test."
+                "As a working parent, a 35-minute daily plan with instant mistake retesting is a game changer. The 150-min exam simulator matches the TNTET feel."
               </p>
               <div className="pt-2 border-t border-white/10">
-                <div className="text-xs font-bold text-white">Anand Kumar</div>
+                <div className="text-xs font-bold text-white">Working Parent Aspirant</div>
                 <div className="text-[10px] text-white/50">Paper I (Primary Teacher) • Salem</div>
               </div>
             </div>
@@ -773,10 +808,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 {'★★★★★'.split('').map((s, i) => <span key={i}>{s}</span>)}
               </div>
               <p className="text-xs text-white/70 italic leading-relaxed">
-                "The SCERT question bank is 100% authentic. The printable PDF diagnostic report helped me spot my weak chapters in Tamil Grammar instantly."
+                "The SCERT-based question bank covers my whole syllabus. The printable PDF diagnostic report helps me spot weak chapters in Tamil Grammar instantly."
               </p>
               <div className="pt-2 border-t border-white/10">
-                <div className="text-xs font-bold text-white">Selvi Murugesan</div>
+                <div className="text-xs font-bold text-white">Self-Study Aspirant</div>
                 <div className="text-[10px] text-white/50">Paper II (Social Science) • Tiruchirappalli</div>
               </div>
             </div>
@@ -838,8 +873,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           <p className="text-xs sm:text-sm text-white/70 max-w-xl mx-auto">
             {isTamil
-              ? '15 நிமிட இலவச ஆரம்ப நிலைத் தேர்வு மூலம் உங்கள் தற்போதைய மதிப்பெண்ணைக் கணக்கிட்டு முன்னேறுங்கள்.'
-              : 'Join thousands of teacher aspirants. Calculate your baseline readiness score in 15 minutes.'}
+              ? '15 நிமிட இலவச ஆரம்ப நிலைத் தேர்வு மூலம் உங்கள் தற்போதைய மதிப்பெண்ணைக் கணக்கிட்டு உங்கள் தினசரி திட்டத்தைப் பெறுங்கள்.'
+              : 'Calculate your baseline readiness score in 15 minutes and get a personalised daily plan.'}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
@@ -860,16 +895,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* 10. Footer */}
-      <footer className="py-8 px-4 sm:px-6 bg-[#080808] border-t border-[#1c1c1c] text-xs text-white/40">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* 10. Privacy & Terms */}
+      <section id="legal" className="py-12 px-4 sm:px-6 bg-[#0c0c0c] border-t border-[#262626]">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div id="privacy" className="space-y-2">
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider">Privacy</h3>
+            <p className="text-[11px] text-white/50 leading-relaxed">
+              {isTamil
+                ? 'உங்கள் தரவு என்க்ரிப்ட் செய்யப்பட்டு Supabase இல் பாதுகாப்பாகச் சேமிக்கப்படும். இப்பயன்பாடு அரசு அல்லது TRB-யுடன் தரவைப் பகிர்வதில்லை. உங்கள் தரவை எந்த நேரத்திலும் நீக்கலாம்.'
+                : 'Your data is encrypted and stored securely via Supabase. This app does not share data with TRB or any government body. You can request deletion of your data at any time.'}
+            </p>
+          </div>
+          <div id="terms" className="space-y-2">
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider">Terms & Disclaimer</h3>
+            <p className="text-[11px] text-white/50 leading-relaxed">
+              {isTamil
+                ? 'TNTET 2026 Coach என்பது சுயாதீனமான (unofficial) பயிற்சி மேடை. அப்ளிகேஷனின் உள்ளடக்கமும் மதிப்பீடுகளும் தகவல் நோக்கத்திற்காக மட்டுமே; அதிகாரப்பூர்வ விதிமுறைகளுக்கு TRB அறிவிப்பையே பின்பற்றவும்.'
+                : 'TNTET 2026 Coach is an independent, unofficial practice platform. Content and score estimates are provided for study purposes only and do not constitute official exam results. Refer to the official TRB notification for authoritative rules.'}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 11. Footer */}
+      <footer className="py-8 px-4 sm:px-6 bg-[#080808] border-t border-[#1c1c1c] text-[10px] text-white/40">
+        <div className="max-w-4xl mx-auto flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
             <GraduationCap className="w-4 h-4 text-[#c5a059]" />
             <span className="font-bold text-white/80">TNTET 2026 Coach</span>
-            <span>• Tamil Nadu Teachers Recruitment Board (TRB) Alignment</span>
           </div>
-          <div>
-            <span>SCERT Samacheer Kalvi Standards</span>
+          <div className="text-center sm:text-right space-y-1">
+            <p>
+              Not affiliated with, endorsed by, or connected to TRB, NCTE, or any government body.
+            </p>
+            <p>
+              {isTamil
+                ? 'பயிற்சி நோக்கத்திற்காக மட்டும் • பாடத்திட்டம்: SCERT சமச்சீர் கல்வி தரநிலைகள்'
+                : 'For practice purposes only • Syllabus: SCERT Samacheer Kalvi standards'}
+            </p>
           </div>
         </div>
       </footer>

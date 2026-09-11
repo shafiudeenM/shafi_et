@@ -287,7 +287,7 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
 
           {/* Canvas Actions */}
           <div className="flex items-center justify-between pt-3 border-t border-[#262626]">
-            <span className="text-xs text-[#737373] font-medium">
+            <span className="text-xs text-[#8f8f8f] font-medium">
               {currentQ.syllabusRef}
             </span>
 
@@ -342,7 +342,7 @@ export const PracticeView: React.FC<PracticeViewProps> = ({
                       <span className="font-bold text-[#c5a059]">Q.{idx + 1}</span>
                       <span className="truncate">{q.concept}</span>
                     </div>
-                    <div className="text-[10px] text-[#737373] truncate">{q.source}</div>
+                    <div className="text-[10px] text-[#8f8f8f] truncate">{q.source}</div>
                   </div>
                   <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-[#262626] text-[#c5a059] shrink-0">
                     {q.difficulty}

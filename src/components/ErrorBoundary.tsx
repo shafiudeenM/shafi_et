@@ -78,14 +78,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               {this.props.fallbackMessage ||
                 'இந்த பகுதியில் பிழை ஏற்பட்டது. கவலை வேண்டாம், உங்கள் தரவு பாதுகாப்பாக உள்ளது. மீண்டும் முயற்சிக்கவும்.'}
               <br />
-              <span className="text-[#737373]">
+              <span className="text-[#8f8f8f]">
                 This section encountered an error. Your data is safe. Please try again.
               </span>
             </p>
 
             {typeof import.meta !== 'undefined' && (import.meta as any).env?.DEV && this.state.error && (
               <details className="mb-4 text-left">
-                <summary className="text-[10px] text-[#737373] cursor-pointer hover:text-white transition">
+                <summary className="text-[10px] text-[#8f8f8f] cursor-pointer hover:text-white transition">
                   பிழை விவரங்கள் / Error Details (Dev)
                 </summary>
                 <pre className="mt-2 p-3 bg-[#0a0a0a] rounded-lg text-[10px] text-red-400 overflow-auto max-h-40 border border-[#262626]">

@@ -106,7 +106,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'mark_budget', labelEn: 'Mark Budget', labelTa: 'மதிப்பெண் திட்டமிடல்' },
     { id: 'srs_review', labelEn: 'SRS Review', labelTa: 'மறுபார்வை பயிற்சி' },
     { id: 'syllabus', labelEn: 'Syllabus', labelTa: 'பாடத்திட்டம்' },
-    { id: 'admin', labelEn: 'Admin Console', labelTa: 'நிர்வாக மையம்' },
   ];
 
   return (
@@ -123,15 +122,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="font-serif font-bold text-base tracking-tight text-white">
                 TNTET <span className="text-[#c5a059] font-normal italic">Coach</span>
               </span>
-              <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#c5a059]/15 text-[#c5a059] border border-[#c5a059]/30">
+              <span className="hidden sm:inline-block text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#c5a059]/15 text-[#c5a059] border border-[#c5a059]/30">
                 SCERT 2026
               </span>
             </div>
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Action Controls (Desktop) */}
+        <div className="hidden md:flex items-center gap-2 sm:gap-2.5">
           {/* Paper Selector Dropdown */}
           <div className="relative group">
             <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-medium text-white/90 hover:text-white transition">
@@ -170,7 +169,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center bg-white/[0.04] rounded-lg p-0.5 border border-white/10 text-xs">
             <button
               onClick={() => onLanguageChange('tamil')}
-              className={`px-2 py-1 rounded-md text-xs font-medium transition ${
+              className={`px-2 py-1.5 rounded-md text-xs font-medium transition ${
                 languageMode === 'tamil' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/50 hover:text-white'
               }`}
               title="தமிழ் விளக்கம்"
@@ -179,7 +178,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => onLanguageChange('bilingual')}
-              className={`px-2 py-1 rounded-md text-xs font-medium transition ${
+              className={`px-2 py-1.5 rounded-md text-xs font-medium transition ${
                 languageMode === 'bilingual' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/50 hover:text-white'
               }`}
               title="Bilingual"
@@ -188,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => onLanguageChange('english')}
-              className={`px-2 py-1 rounded-md text-xs font-medium transition ${
+              className={`px-2 py-1.5 rounded-md text-xs font-medium transition ${
                 languageMode === 'english' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/50 hover:text-white'
               }`}
               title="English Medium"
@@ -244,6 +243,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="hidden md:inline">{isTamil ? 'நிறுவுக' : 'Install'}</span>
             </button>
           )}
+        </div>
 
           {/* User Account / Profile Dropdown & Settings */}
           <div className="relative">
@@ -332,7 +332,80 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
         </div>
-      </div>
+
+        {/* Mobile Secondary Controls Strip */}
+        <div className="md:hidden flex items-center gap-2 overflow-x-auto scrollbar-none px-3 pb-2">
+          {/* Language Toggle */}
+          <div className="flex items-center bg-white/[0.04] rounded-lg p-0.5 border border-white/10 text-xs">
+            <button
+              onClick={() => onLanguageChange('tamil')}
+              className={`px-2 py-1.5 rounded-md text-xs font-medium transition ${
+                languageMode === 'tamil' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/50 hover:text-white'
+              }`}
+            >
+              தமிழ்
+            </button>
+            <button
+              onClick={() => onLanguageChange('bilingual')}
+              className={`px-2 py-1.5 rounded-md text-xs font-medium transition ${
+                languageMode === 'bilingual' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/50 hover:text-white'
+              }`}
+            >
+              BIL
+            </button>
+            <button
+              onClick={() => onLanguageChange('english')}
+              className={`px-2 py-1.5 rounded-md text-xs font-medium transition ${
+                languageMode === 'english' ? 'bg-[#c5a059] text-black font-bold' : 'text-white/50 hover:text-white'
+              }`}
+            >
+              ENG
+            </button>
+          </div>
+
+          {/* Daily Plan Progress Tracker (Compact) */}
+          {dailyPlan && (
+            <DailyPlanProgressTracker
+              dailyPlan={dailyPlan}
+              isTamil={isTamil}
+              onStartDailyPlan={onStartDailyPlan}
+              compact={true}
+            />
+          )}
+
+          {/* Useful Integrations & OMR Button */}
+          {onOpenIntegrationsModal && (
+            <button
+              onClick={onOpenIntegrationsModal}
+              className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 transition"
+              title="Google Calendar, Sheets & OMR Practice Tools"
+            >
+              <Sparkles className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* PDF Report Button */}
+          {onOpenPDFExportModal && (
+            <button
+              onClick={onOpenPDFExportModal}
+              className="p-2.5 rounded-lg bg-[#c5a059]/15 text-[#c5a059] border border-[#c5a059]/30 transition"
+              title="Export Performance PDF Report"
+            >
+              <FileText className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* PWA Install Button if eligible */}
+          {canInstall && (
+            <button
+              onClick={handleInstallClick}
+              className="p-2.5 rounded-lg bg-white/[0.04] text-white/80 border border-white/10 transition"
+              title="Install TNTET Coach App"
+            >
+              <Download className="w-4 h-4 text-[#c5a059]" />
+            </button>
+          )}
+        </div>
 
       {/* Clean Tab Bar (Desktop Only - Mobile uses Bottom Navigation) */}
       <div className="hidden md:block border-t border-white/[0.06] bg-[#0f0f0f]">

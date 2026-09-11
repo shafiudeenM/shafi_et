@@ -56,7 +56,7 @@ export const MarkBudgetView: React.FC<MarkBudgetViewProps> = ({
             <div className="text-lg font-serif font-bold text-[#c5a059] mt-0.5">
               {plan.qualifyingScore}/150
             </div>
-            <span className="text-[10px] text-[#737373]">{plan.qualifyingPercent}%</span>
+            <span className="text-[10px] text-[#8f8f8f]">{plan.qualifyingPercent}%</span>
           </div>
 
           <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
@@ -66,7 +66,7 @@ export const MarkBudgetView: React.FC<MarkBudgetViewProps> = ({
             <div className={`text-lg font-serif font-bold mt-0.5 ${getMarginColor(plan.margin)}`}>
               {plan.currentProjected}/150
             </div>
-            <span className="text-[10px] text-[#737373]">
+            <span className="text-[10px] text-[#8f8f8f]">
               {plan.margin >= 0 ? '+' : ''}{plan.margin} {isTamil ? 'மதிப்பு வித்தியாசம்' : 'margin'}
             </span>
           </div>
@@ -78,7 +78,7 @@ export const MarkBudgetView: React.FC<MarkBudgetViewProps> = ({
             <div className="text-lg font-serif font-bold text-[#ef4444] mt-0.5">
               {plan.subjectBudgets.filter(b => b.priority === 'focus').length}
             </div>
-            <span className="text-[10px] text-[#737373]">
+            <span className="text-[10px] text-[#8f8f8f]">
               {isTamil ? 'பாடங்கள்' : 'subjects'}
             </span>
           </div>
@@ -93,7 +93,7 @@ export const MarkBudgetView: React.FC<MarkBudgetViewProps> = ({
                 : (isTamil ? 'ஆபத்து' : 'At Risk')
               }
             </div>
-            <span className="text-[10px] text-[#737373]">
+            <span className="text-[10px] text-[#8f8f8f]">
               {isTamil ? 'தற்போதைய நிலை' : 'Current Status'}
             </span>
           </div>
@@ -168,7 +168,7 @@ export const MarkBudgetView: React.FC<MarkBudgetViewProps> = ({
 
             {/* Target Line */}
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[9px] text-[#737373]">
+              <span className="text-[9px] text-[#8f8f8f]">
                 {isTamil ? 'இலக்கு' : 'Target'}: {budget.targetMarks}/{budget.maxMarks}
               </span>
               <span className={`text-[9px] font-bold ${budget.gap <= 0 ? 'text-[#4ade80]' : 'text-[#fca5a5]'}`}>
@@ -183,8 +183,8 @@ export const MarkBudgetView: React.FC<MarkBudgetViewProps> = ({
 
             {/* Mastery Badge */}
             <div className="mt-3 flex items-center gap-2">
-              <BarChart3 className="w-3 h-3 text-[#737373]" />
-              <span className="text-[9px] text-[#737373]">
+              <BarChart3 className="w-3 h-3 text-[#8f8f8f]" />
+              <span className="text-[9px] text-[#8f8f8f]">
                 {isTamil ? 'தற்போதைய திறன்' : 'Current Mastery'}: {budget.currentMastery}%
               </span>
             </div>

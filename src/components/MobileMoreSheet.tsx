@@ -242,6 +242,19 @@ export const MobileMoreSheet: React.FC<MobileMoreSheetProps> = ({
                 <div className="text-[10px] text-white/50">{isTamil ? 'SCERT தலைப்புகள்' : 'Weightage Map'}</div>
               </div>
             </button>
+
+            <button
+              onClick={() => handleSelectTab('admin')}
+              className={`p-3 rounded-xl border text-left flex items-start gap-2.5 transition ${
+                activeTab === 'admin' ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.05]'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-400 mt-0.5" />
+              <div>
+                <div className="text-xs font-bold text-white">{isTamil ? 'நிர்வாக மையம்' : 'Admin Console'}</div>
+                <div className="text-[10px] text-white/50">{isTamil ? 'கட்டுப்பாட்டு அறை' : 'Super Admin'}</div>
+              </div>
+            </button>
           </div>
         </div>
 

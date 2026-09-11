@@ -163,13 +163,13 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
                 <span className="text-[10px] text-[#a3a3a3] font-bold uppercase tracking-wider">{isTamil ? 'துல்லிய மதிப்பெண்' : 'Score'}</span>
                 <div className="text-xl font-serif font-bold text-[#c5a059] mt-0.5">{correctCount} / {diagnosticQuestions.length}</div>
-                <span className="text-[10px] text-[#737373]">{scorePct}% {isTamil ? 'சரியானது' : 'Accuracy'}</span>
+                <span className="text-[10px] text-[#8f8f8f]">{scorePct}% {isTamil ? 'சரியானது' : 'Accuracy'}</span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
                 <span className="text-[10px] text-[#a3a3a3] font-bold uppercase tracking-wider">{isTamil ? 'சராசரி நேரம்' : 'Avg Pacing'}</span>
                 <div className="text-xl font-serif font-bold text-white mt-0.5">{avgTimeSec}s</div>
-                <span className="text-[10px] text-[#737373]">{avgTimeSec <= 50 ? 'Optimal' : 'High time'}</span>
+                <span className="text-[10px] text-[#8f8f8f]">{avgTimeSec <= 50 ? 'Optimal' : 'High time'}</span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
@@ -177,13 +177,13 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
                 <div className={`text-xl font-serif font-bold mt-0.5 ${scorePct >= qualifyingCutoff ? 'text-[#4ade80]' : 'text-[#fca5a5]'}`}>
                   {scorePct >= qualifyingCutoff ? `+${scorePct - qualifyingCutoff}%` : `${scorePct - qualifyingCutoff}%`}
                 </div>
-                <span className="text-[10px] text-[#737373]">{scorePct >= qualifyingCutoff ? 'Safe' : 'Needs boost'}</span>
+                <span className="text-[10px] text-[#8f8f8f]">{scorePct >= qualifyingCutoff ? 'Safe' : 'Needs boost'}</span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#181818] border border-[#262626]">
                 <span className="text-[10px] text-[#a3a3a3] font-bold uppercase tracking-wider">{isTamil ? 'முக்கிய பிழை' : 'Top Trap'}</span>
                 <div className="text-base font-bold text-[#c5a059] truncate mt-0.5">Concept Trap</div>
-                <span className="text-[10px] text-[#737373]">Targeted in Daily Plan</span>
+                <span className="text-[10px] text-[#8f8f8f]">Targeted in Daily Plan</span>
               </div>
             </div>
           </div>
@@ -418,7 +418,7 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
 
         {/* Submit / Next Actions */}
         <div className="flex items-center justify-between pt-2">
-          <span className="text-xs text-[#737373]">
+          <span className="text-xs text-[#8f8f8f]">
             {isTamil ? 'அனைத்து பாடப் பிரிவுகளும் மாதிரி எடுக்கப்படும்' : 'Sampling all key syllabus areas'}
           </span>
 
@@ -429,7 +429,7 @@ export const DiagnosticView: React.FC<DiagnosticViewProps> = ({
               className={`px-6 py-2.5 rounded-xl font-bold text-xs transition shadow-lg ${
                 selectedOption !== null
                   ? 'bg-[#c5a059] hover:bg-[#d4b068] text-[#0a0a0a] shadow-[#c5a059]/20'
-                  : 'bg-[#181818] text-[#737373] border border-[#262626] cursor-not-allowed'
+                  : 'bg-[#181818] text-[#8f8f8f] border border-[#262626] cursor-not-allowed'
               }`}
             >
               {isTamil ? 'விடையை உறுதிசெய்' : 'Confirm & Check'}

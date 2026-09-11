@@ -89,7 +89,7 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ languageMode }) =>
               <span className="text-[10px] font-bold text-white block">
                 {isTamil ? nextMilestone.titleTa : nextMilestone.titleEn}
               </span>
-              <span className="text-[9px] text-[#737373]">
+              <span className="text-[9px] text-[#8f8f8f]">
                 {isTamil ? nextMilestone.descriptionTa : nextMilestone.descriptionEn}
               </span>
             </div>
@@ -111,13 +111,13 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ languageMode }) =>
         <div className="p-2.5 rounded-lg bg-[#181818] border border-[#262626]">
           <Trophy className="w-3.5 h-3.5 text-[#c5a059] mb-1" />
           <div className="text-sm font-serif font-bold text-white">{streakData.longestStreak}</div>
-          <span className="text-[9px] text-[#737373]">{isTamil ? 'சிறந்த தொடர்' : 'Best Streak'}</span>
+          <span className="text-[9px] text-[#8f8f8f]">{isTamil ? 'சிறந்த தொடர்' : 'Best Streak'}</span>
         </div>
 
         <div className="p-2.5 rounded-lg bg-[#181818] border border-[#262626]">
           <Calendar className="w-3.5 h-3.5 text-[#c5a059] mb-1" />
           <div className="text-sm font-serif font-bold text-white">{streakData.totalStudyDays}</div>
-          <span className="text-[9px] text-[#737373]">{isTamil ? 'மொத்த நாள்' : 'Total Days'}</span>
+          <span className="text-[9px] text-[#8f8f8f]">{isTamil ? 'மொத்த நாள்' : 'Total Days'}</span>
         </div>
 
         <div className="p-2.5 rounded-lg bg-[#181818] border border-[#262626]">
@@ -125,7 +125,7 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ languageMode }) =>
           <div className="text-sm font-serif font-bold text-white">
             {streakData.weeklyActual}/{streakData.weeklyGoal}
           </div>
-          <span className="text-[9px] text-[#737373]">{isTamil ? 'இந்த வாரம்' : 'This Week'}</span>
+          <span className="text-[9px] text-[#8f8f8f]">{isTamil ? 'இந்த வாரம்' : 'This Week'}</span>
         </div>
 
         <div className="p-2.5 rounded-lg bg-[#181818] border border-[#262626]">
@@ -133,7 +133,7 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ languageMode }) =>
           <div className="text-sm font-serif font-bold text-white">
             {streakData.monthlyActual}/{streakData.monthlyGoal}
           </div>
-          <span className="text-[9px] text-[#737373]">{isTamil ? 'இந்த மாதம்' : 'This Month'}</span>
+          <span className="text-[9px] text-[#8f8f8f]">{isTamil ? 'இந்த மாதம்' : 'This Month'}</span>
         </div>
       </div>
 
@@ -145,15 +145,15 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ languageMode }) =>
         <div className="flex items-center gap-4 mt-1.5">
           <div>
             <span className="text-sm font-bold text-white">{streakData.todayMinutes}</span>
-            <span className="text-[9px] text-[#737373] ml-1">{isTamil ? 'நிமிடம்' : 'min'}</span>
+            <span className="text-[9px] text-[#8f8f8f] ml-1">{isTamil ? 'நிமிடம்' : 'min'}</span>
           </div>
           <div>
             <span className="text-sm font-bold text-white">{streakData.todayQuestions}</span>
-            <span className="text-[9px] text-[#737373] ml-1">{isTamil ? 'வினா' : 'Q'}</span>
+            <span className="text-[9px] text-[#8f8f8f] ml-1">{isTamil ? 'வினா' : 'Q'}</span>
           </div>
           <div>
             <span className="text-sm font-bold text-[#4ade80]">{streakData.todayCorrect}</span>
-            <span className="text-[9px] text-[#737373] ml-1">{isTamil ? 'சரி' : 'correct'}</span>
+            <span className="text-[9px] text-[#8f8f8f] ml-1">{isTamil ? 'சரி' : 'correct'}</span>
           </div>
         </div>
       </div>
@@ -199,7 +199,7 @@ export const StreakDisplay: React.FC<StreakDisplayProps> = ({ languageMode }) =>
                 }`}
               >
                 <span className="text-sm">{m.icon}</span>
-                <span className={`text-[8px] font-bold ${achieved ? 'text-[#4ade80]' : 'text-[#737373]'}`}>
+                <span className={`text-[10px] font-bold ${achieved ? 'text-[#4ade80]' : 'text-[#8f8f8f]'}`}>
                   {m.days}d
                 </span>
               </div>
