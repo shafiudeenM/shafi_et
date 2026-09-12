@@ -123,46 +123,59 @@ export function calculateCandidateReadiness(
     }));
   }
 
-  // 1. Knowledge Score (Average topic mastery across all subjects)
-  const avgMastery = topicMasteries.length > 0
-    ? topicMasteries.reduce((sum, t) => sum + t.masteryPercent, 0) / topicMasteries.length
-    : 50;
-  const knowledgeScore = Math.round(avgMastery);
+  // Honest data availability: how much real evidence exists for this candidate.
+  const totalAttempts = topicMasteries.reduce((s, t) => s + (t.totalAttempted || 0), 0);
+  const attemptedTopics = topicMasteries.filter((t) => (t.totalAttempted || 0) > 0);
+  const hasRealData = totalAttempts > 0 && attemptedTopics.length > 0;
 
-  // 2. Accuracy Score (Weighted by recent interactions)
+  // 1. Knowledge Score (Average mastery across topics that were actually attempted.
+  //    Untouched topics are "not measured yet", not "0% failing", so they stay out.)
+  const knowledgeScore = attemptedTopics.length > 0
+    ? Math.round(attemptedTopics.reduce((sum, t) => sum + t.masteryPercent, 0) / attemptedTopics.length)
+    : 0;
+
+  // 2. Accuracy Score (Measured only from real recorded interactions)
   const recentInteractions = interactions.slice(-30);
   const correctCount = recentInteractions.filter(i => i.isCorrect).length;
   const accuracyScore = recentInteractions.length > 0
     ? Math.round((correctCount / recentInteractions.length) * 100)
-    : 62;
+    : 0;
 
-  // 3. Speed Score (Ideal: 35-50s per question)
+  // 3. Speed Score (Measured from real pacing; 0 when there is no pacing data)
   const avgSpeed = recentInteractions.length > 0
     ? recentInteractions.reduce((sum, i) => sum + i.timeSpentSec, 0) / recentInteractions.length
-    : 45;
-  let speedScore = 75;
-  if (avgSpeed >= 30 && avgSpeed <= 55) {
-    speedScore = 90;
-  } else if (avgSpeed > 55 && avgSpeed <= 80) {
-    speedScore = 65;
-  } else if (avgSpeed > 80) {
-    speedScore = 45;
+    : null;
+  let speedScore = 0;
+  if (avgSpeed !== null) {
+    if (avgSpeed >= 30 && avgSpeed <= 55) {
+      speedScore = 90;
+    } else if (avgSpeed > 55 && avgSpeed <= 80) {
+      speedScore = 65;
+    } else if (avgSpeed > 80) {
+      speedScore = 45;
+    }
   }
 
-  // 4. Consistency Score
-  const consistencyScore = Math.min(95, Math.max(40, Math.round((knowledgeScore + accuracyScore) / 2 + 4)));
+  // 4. Consistency Score (Blends measured knowledge & accuracy; only exists with real data)
+  const consistencyScore = hasRealData
+    ? Math.min(95, Math.max(15, Math.round((knowledgeScore + accuracyScore) / 2 + 4)))
+    : 0;
 
-  // Weighted overall readiness
-  const overallScore = Math.round(
-    0.35 * knowledgeScore +
-    0.30 * accuracyScore +
-    0.20 * speedScore +
-    0.15 * consistencyScore
-  );
+  // Weighted overall readiness — computed solely from real measurements
+  const overallScore = hasRealData
+    ? Math.round(
+        0.35 * knowledgeScore +
+        0.30 * accuracyScore +
+        0.20 * speedScore +
+        0.15 * consistencyScore
+      )
+    : 0;
 
-  // Projected Marks out of 150
-  const projectedMarks = Math.min(150, Math.max(45, Math.round((overallScore / 100) * 150)));
-  const marginAboveCutoff = projectedMarks - qualifyingThreshold;
+  // Projected Marks out of 150 — no artificial floor, honest 0 until data exists
+  const projectedMarks = hasRealData
+    ? Math.min(150, Math.round((overallScore / 100) * 150))
+    : 0;
+  const marginAboveCutoff = hasRealData ? projectedMarks - qualifyingThreshold : 0;
 
   // Subject breakdowns
   const subjectMap = new Map<SubjectId, { sum: number; count: number }>();
@@ -194,22 +207,28 @@ export function calculateCandidateReadiness(
       };
     });
 
-  // Identify primary bottlenecks
-  const weakTopics = topicMasteries.filter(t => t.status === 'weak');
+  // Identify primary bottlenecks — driven by real data only
+  const weakTopics = topicMasteries.filter(t => (t.totalAttempted || 0) > 0 && t.status === 'weak');
   const bottlenecksEn: string[] = [];
   const bottlenecksTa: string[] = [];
 
-  if (weakTopics.length > 0) {
-    bottlenecksEn.push(`Lagging in ${weakTopics[0].topicNameEn} (${weakTopics[0].masteryPercent}% mastery)`);
-    bottlenecksTa.push(`${weakTopics[0].topicNameTa} பாடத்தில் தேர்ச்சி குறைவு (${weakTopics[0].masteryPercent}%)`);
+  if (!hasRealData) {
+    bottlenecksEn.push('No practice data yet. Take the 15-min diagnostic or your first daily workout to unlock a real readiness analysis.');
+    bottlenecksTa.push('இதுவரை பயிற்சி தரவுகள் இல்லை. உண்மையான தயார்நிலை பகுப்பாய்வைப் பெற கண்டறி சோதனை அல்லது முதல் தினசரி பயிற்சியை முடிக்கவும்.');
+  } else if (weakTopics.length > 0) {
+    bottlenecksEn.push(`Lagging in ${weakTopics[0].topicNameEn} (${weakTopics[0].masteryPercent}% mastery across ${weakTopics[0].totalAttempted} attempts)`);
+    bottlenecksTa.push(`${weakTopics[0].topicNameTa} பாடத்தில் தேர்ச்சி குறைவு (${weakTopics[0].totalAttempted} முயற்சிகளில் ${weakTopics[0].masteryPercent}% தேர்ச்சி)`);
+    if (speedScore > 0 && speedScore < 60) {
+      bottlenecksEn.push('Spending >65s per question in Calculations; time loss in the final third of a mock.');
+      bottlenecksTa.push('வினாக்களுக்கு அதிக நேரம் எடுத்துக்கொள்வதால் தேர்வு இறுதியில் நேரப் பற்றாக்குறை ஏற்படும் அபாயம்.');
+    }
+  } else if (speedScore > 0 && speedScore < 60) {
+    bottlenecksEn.push('Spending >65s per question in Calculations; time loss in the final third of a mock.');
+    bottlenecksTa.push('வினாக்களுக்கு அதிக நேரம் எடுத்துக்கொள்வதால் தேர்வு இறுதியில் நேரப் பற்றாக்குறை ஏற்படும் அபாயம்.');
   }
-  if (speedScore < 60) {
-    bottlenecksEn.push('Spending >65s per question in Calculations; time loss in final third of mock');
-    bottlenecksTa.push('வினாக்களுக்கு அதிக நேரம் எடுத்துக்கொள்வதால் தேர்வு இறுதியில் நேரப் பற்றாக்குறை ஏற்படும் அபாயம்');
-  }
-  if (bottlenecksEn.length === 0) {
-    bottlenecksEn.push('Keep practicing to build rapid question classification reflexes');
-    bottlenecksTa.push('தொடர் பயிற்சிகள் மூலம் வினாக்களை விரைவாக அடையாளம் காணும் திறனை வளர்க்கவும்');
+  if (hasRealData && bottlenecksEn.length === 0) {
+    bottlenecksEn.push(`Solid start on ${totalAttempts} questions — keep the daily loop to sharpen accuracy and pacing.`);
+    bottlenecksTa.push(`${totalAttempts} வினாக்களுடன் நல்ல தொடக்கம் — துல்லியத்தையும் வேகத்தையும் மேம்படுத்த தினசரி பயிற்சியை தொடரவும்.`);
   }
 
   return {

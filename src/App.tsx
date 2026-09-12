@@ -234,12 +234,12 @@ export default function App() {
     theme,
   };
 
-  // Fresh users haven't completed a diagnostic and have no practice history yet:
-  // show the simple onboarding dashboard instead of the full analytics stack.
-  const isFreshUser =
-    !hasCompletedDiagnostic &&
-    userInteractions.length === 0 &&
-    topicMasteries.every((t) => (t.totalAttempted || 0) === 0);
+  // Fresh users haven't answered a single question yet: show the simple
+  // onboarding dashboard instead of the full analytics stack. This is based
+  // purely on real recorded data (a stale "diagnostic done" flag must not
+  // make a brand-new user look like a returning one).
+  const totalAttemptedCount = topicMasteries.reduce((s, t) => s + (t.totalAttempted || 0), 0);
+  const isFreshUser = userInteractions.length === 0 && totalAttemptedCount === 0;
 
   // Background sync candidate profile
   useEffect(() => {
@@ -651,6 +651,7 @@ export default function App() {
             dailyPlan={dailyPlan}
             userProfile={userProfile}
             languageMode={languageMode}
+            userInteractions={userInteractions}
             onStartDailyPlan={() => setActiveTab('daily_plan')}
             onStartDiagnostic={() => setActiveTab('diagnostic')}
             onNavigateToTopic={(topicId) => {

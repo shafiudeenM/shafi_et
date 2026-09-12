@@ -9,3 +9,5 @@ coverage/
 firebase-applet-config.json
 bun.lock
 bun.lockb
+
+test-results/
