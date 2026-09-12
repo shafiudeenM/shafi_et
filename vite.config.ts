@@ -5,6 +5,9 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // Build for GitHub Pages: the site lives at /shafi_et/ (project Pages), so
+    // asset URLs must be relative to that subpath in production only.
+    base: process.env.GITHUB_PAGES === 'true' ? '/shafi_et/' : '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
